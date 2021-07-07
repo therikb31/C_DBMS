@@ -1,1 +1,5 @@
-TINT1 Rik Biswas    1234    10000
+100001 Rik Biswas 1234 10000
+100002 Ananya Verma 3521 50000
+100003 Omra Akhtar 4321 50000
+100004 Sweta Srivastava 6969 69000
+100005 Swati Kumari 1000 40000
