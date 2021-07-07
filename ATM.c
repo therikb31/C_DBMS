@@ -56,7 +56,7 @@ void writer()
     int i;
     for(i=0;i<dataCount;i++)
     {
-        fprintf(fp,"%d %s %s %d %d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance);
+        fprintf(fp,"%d\t%s\t%s\t%d\t%d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance);
         if(i<dataCount-1)
         {
             fprintf(fp,"\n");
