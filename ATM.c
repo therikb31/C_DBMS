@@ -12,9 +12,11 @@ struct data
     int balance;
 };
 struct data acc[100];
+int dataCount=0;
 void main()
 {
     myimport();
+    createAccount();
 }
 void myimport()//Import data from Account Details
 {
@@ -26,5 +28,17 @@ void myimport()//Import data from Account Details
         fscanf(fp,"%s %s %s %d %d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,&acc[i].pin,&acc[i].balance);
         i++;
     }
+    dataCount=i;
     fclose(fp);
+}
+void createAccount()
+{
+    printf("Enter your First Name :");
+    scanf("%s", acc[dataCount].firstName);
+    printf("Enter your Last Name:");
+    scanf("%s",acc[dataCount].lastName);
+    printf("Enter Pin:");
+    scanf("%d",&acc[dataCount].pin);
+    printf("Enter the Opening Balance:");
+    scanf("%d",&acc[dataCount].balance);
 }
