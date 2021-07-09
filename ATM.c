@@ -1,10 +1,23 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-void import();
+void importDetails();
+void importTrans(int);
 void createAccount();
 void writer();
 void intToStr(char*,int);
+void withdrawl();
+int auth(int,int);
+int search(int);
+void getFileName(char*,int);
+void transHistory();
+struct transaction
+{
+    int initalBalance;
+    int creditAmount;
+    int debitAmount;
+    int finalBalance;
+};
 struct data
 {
     int accountNumber;
@@ -15,13 +28,15 @@ struct data
 };
 struct data acc[100];
 int dataCount=0;
+struct transaction trans[100];
+int transCount=0;
 void main()
 {
-    import();
-    createAccount();
+    importDetails();
+    transHistory();
     writer();
 }
-void import()//Import data from Account Details
+void importDetails()//Import data from Account Details
 {
     FILE *fp;
     fp=fopen("accDet.txt","r");
@@ -34,12 +49,28 @@ void import()//Import data from Account Details
     dataCount=i;
     fclose(fp);
 }
+void importTrans(int accNo)
+{
+    FILE* fp;
+    char fileName[30]="";
+    getFileName(&fileName[0],accNo);
+    fp=fopen(fileName,"r");
+    int i=0;
+    while(!feof(fp))
+    {
+        fscanf(fp,"%d %d %d %d",&trans[i].initalBalance,&trans[i].creditAmount,&trans[i].debitAmount,&trans[i].finalBalance);
+        i++;
+    }
+    transCount=i;
+    fclose(fp);
+
+}
 void createAccount()//Create Account and Store it in structure acc 
 {
     FILE* fp;
     int accno;
-    char accstr[10]="",fileName[30]="./Transaction/";
-    accno=acc[dataCount-1].accountNumber+1;//100009+1=100010
+    char fileName[30]="";
+    accno=acc[dataCount-1].accountNumber+1;
     acc[dataCount].accountNumber=accno;
     printf("Enter your First Name :");
     scanf("%s", acc[dataCount].firstName);
@@ -50,14 +81,11 @@ void createAccount()//Create Account and Store it in structure acc
     printf("Enter the Opening Balance:");
     scanf("%d",&acc[dataCount].balance);
     printf("Your account number is %d\n",accno);
-    intToStr(&accstr[0],accno);
-    strcat(fileName,accstr);
-    strcat(fileName,".txt");
+    getFileName(&fileName[0],accno);
     fp=fopen(fileName,"w");
-    fprintf(fp,"0\t+%d\t%d\n",acc[dataCount].balance,acc[dataCount].balance);
+    fprintf(fp,"0\t%d\t0\t%d\n",acc[dataCount].balance,acc[dataCount].balance);
     dataCount++;
-    fclose(fp);
-    
+    fclose(fp); 
 }
 void writer()//Writes all the changes made to Acount Details
 {
@@ -83,10 +111,83 @@ void intToStr(char* st,int n)
         n=n/10;
         arr[c]=r;
         c++;
-    }//arr=6,5,4,3,2,1
-    for(i=c-1;i>=0;i--)//i=5
-    {//0 -> 48 to 57
+    }
+    for(i=c-1;i>=0;i--)
+    {
         st[d]=(char)arr[i]+48;
         d++;
+    }
+}
+void withdrawl()
+{
+    FILE* fp;
+    char fileName[30];
+    int accNo,pin,i,amt,bal;
+    printf("Enter Acc No:");
+    scanf("%d",&accNo);
+    printf("Enter PIN:");
+    scanf("%d",&pin);
+    i=search(accNo);
+    if(auth(acc[i].pin,pin)==1)
+    {
+        printf("Enter Amount to be withdrawn:");
+        scanf("%d",&amt);
+        bal=acc[i].balance;
+        if(bal>=amt)
+        {
+            acc[i].balance-=amt;
+        }
+    }
+    getFileName(&fileName[0],accNo);
+    fp=fopen(fileName,"a");
+    fprintf(fp,"%d\t0\t%d\t%d\n",bal,amt,acc[i].balance);
+    fclose(fp);
+}
+int auth(int pin1,int pin2)
+{
+    if(pin1==pin2)
+    {
+        return(1);
+    }
+    else
+    {
+        return(0);
+    }
+}
+int search(int accNo)
+{
+    int i;
+    for(i=0;i<dataCount;i++)
+    {
+        if(acc[i].accountNumber==accNo)
+        {
+            return(i);
+            break;
+        }
+    }
+}
+void getFileName(char* fileName,int accNo)
+{
+    char accstr[10]="";
+    strcpy(fileName,"./Transaction/");
+    intToStr(&accstr[0],accNo);
+    strcat(fileName,accstr);
+    strcat(fileName,".txt");
+}
+void transHistory()
+{
+    int accNo,pin,i,j;
+    printf("Enter Acc No:");
+    scanf("%d",&accNo);
+    printf("Enter PIN:");
+    scanf("%d",&pin);
+    i=search(accNo);
+    if(auth(pin,acc[i].pin)==1)
+    {
+        importTrans(accNo);
+        for(j=0;j<transCount;j++)
+        {
+            printf("%d\t%d\t%d\t%d\n",trans[j].initalBalance,trans[j].creditAmount,trans[j].debitAmount,trans[j].finalBalance);
+        }
     }
 }
