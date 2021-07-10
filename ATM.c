@@ -12,6 +12,7 @@ int search(int);
 void getFileName(char*,int);
 void transHistory();
 int login();
+void deposit();
 struct transaction
 {
     int initalBalance;
@@ -43,7 +44,7 @@ void main()
         case 1:
         if(login()==1)
         {
-            printf("1.Withdrawl\n2.Transaction History\nEnter your choice:");
+            printf("1.Withdrawl\n2.Deposit\n3.Transaction History\nEnter your choice:");
             scanf("%d",&ch1);
             switch (ch1)
             {
@@ -51,6 +52,9 @@ void main()
                     withdrawl();
                     break;
                 case 2:
+                    deposit();
+                    break;
+                case 3:
                     transHistory();
                     break;
                 default:
@@ -250,5 +254,19 @@ int login()
         printf("Account Doesnot Exist!\n");
         return 0;
     }
-
+}
+void deposit()
+{
+    FILE* fp;
+    int amt,bal,accNo;
+    char fileName[30];// ./Transaction/100003.txt
+    printf("Deposit Amount:");
+    scanf("%d",&amt);
+    bal=acc[userIndex].balance;
+    acc[userIndex].balance+=amt;
+    accNo=acc[userIndex].accountNumber;
+    getFileName(&fileName[0],accNo);
+    fp=fopen(fileName,"a");
+    fprintf(fp,"\n%d\t%d\t0\t%d",bal,amt,acc[userIndex].balance);
+    printf("Transaction Successful!!\nYour Account Balance is %d\n",acc[userIndex].balance);
 }
