@@ -13,6 +13,7 @@ void getFileName(char*,int);
 void transHistory();
 int login();
 void deposit();
+void transferFund();
 struct transaction
 {
     int initalBalance;
@@ -44,7 +45,7 @@ void main()
         case 1:
         if(login()==1)
         {
-            printf("1.Withdrawl\n2.Deposit\n3.Transaction History\nEnter your choice:");
+            printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\nEnter your choice:");
             scanf("%d",&ch1);
             switch (ch1)
             {
@@ -55,10 +56,13 @@ void main()
                     deposit();
                     break;
                 case 3:
+                    transferFund();
+                    break;
+                case 4:
                     transHistory();
                     break;
                 default:
-                    printf("Wrong Choice!");
+                    printf("Wrong Choice!\n");
                     break;
             }
 
@@ -177,7 +181,7 @@ void withdrawl()
         printf("Transaction Successful!!\nYour Account balance is %d\n",acc[userIndex].balance);
         getFileName(&fileName[0],accNo);
         fp=fopen(fileName,"a");
-        fprintf(fp,"\n%d\t0\t%d\t%d\n",bal,amt,acc[userIndex].balance);
+        fprintf(fp,"\n%d\t0\t%d\t%d",bal,amt,acc[userIndex].balance);
         fclose(fp);
     } 
     else
@@ -269,4 +273,42 @@ void deposit()
     fp=fopen(fileName,"a");
     fprintf(fp,"\n%d\t%d\t0\t%d",bal,amt,acc[userIndex].balance);
     printf("Transaction Successful!!\nYour Account Balance is %d\n",acc[userIndex].balance);
+}
+void transferFund()
+{
+    FILE *fp;
+    char fileName[30]="",recFileName[30]="";
+    int recAccNo,recUserIndex=-1,i,tamt,bal,recBal;
+    bal=acc[userIndex].balance;
+    printf("Reciever's Account No:");
+    scanf("%d",&recAccNo);
+    for(i=0;i<dataCount;i++)
+    {
+        if(acc[i].accountNumber==recAccNo)
+        {
+            recUserIndex=i;
+            break;
+        }
+    }
+    recBal=acc[recUserIndex].balance;
+    if(recUserIndex>=0)
+    {
+        printf("Trasfer Amount:");
+        scanf("%d",&tamt);
+        acc[userIndex].balance-=tamt;
+        getFileName(&fileName[0],acc[userIndex].accountNumber);
+        fp=fopen(fileName,"a");
+        fprintf(fp,"\n%d\t0\t%d\t%d",bal,tamt,acc[userIndex].balance);
+        fclose(fp);
+        acc[recUserIndex].balance+=tamt;
+        getFileName(&recFileName[0],acc[recUserIndex].accountNumber);
+        fp=fopen(recFileName,"a");
+        fprintf(fp,"\n%d\t%d\t0\t%d",recBal,tamt,acc[recUserIndex].balance);
+        fclose(fp);
+        printf("Trasfer Successfull!\nYour Account Balance is %d\n",acc[userIndex].balance);
+    }
+    else
+    {
+        printf("Invalid Account No!\n");
+    }
 }
