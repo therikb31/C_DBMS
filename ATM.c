@@ -2,7 +2,7 @@
 #include<string.h>
 #include<stdlib.h>
 void importDetails();
-void importTrans(int);
+void importTrans();
 void createAccount();
 void writer();
 void intToStr(char*,int);
@@ -11,6 +11,7 @@ int auth(int,int);
 int search(int);
 void getFileName(char*,int);
 void transHistory();
+int login();
 struct transaction
 {
     int initalBalance;
@@ -30,10 +31,46 @@ struct data acc[100];
 int dataCount=0;
 struct transaction trans[100];
 int transCount=0;
+int userIndex;
 void main()
 {
     importDetails();
-    transHistory();
+    int ch,ch1;
+    printf("Welcome to the Bank Of TINT\n1.Login\n2.Create Account\nEnter your Choice:");
+    scanf("%d",&ch);
+    switch(ch)
+    {
+        case 1:
+        if(login()==1)
+        {
+            printf("1.Withdrawl\n2.Transaction History\nEnter your choice:");
+            scanf("%d",&ch1);
+            switch (ch1)
+            {
+                case 1:
+                    withdrawl();
+                    break;
+                case 2:
+                    transHistory();
+                    break;
+                default:
+                    printf("Wrong Choice!");
+                    break;
+            }
+
+        }
+        else
+        {
+            printf("Login Unsuccessful!\n");
+        }
+        break;
+        case 2:
+            createAccount();
+            break;
+        default:
+            printf("Wrong Choice!");
+            break;
+    }
     writer();
 }
 void importDetails()//Import data from Account Details
@@ -49,9 +86,11 @@ void importDetails()//Import data from Account Details
     dataCount=i;
     fclose(fp);
 }
-void importTrans(int accNo)
+void importTrans()
 {
     FILE* fp;
+    int accNo;
+    accNo = acc[userIndex].accountNumber;
     char fileName[30]="";
     getFileName(&fileName[0],accNo);
     fp=fopen(fileName,"r");
@@ -69,9 +108,9 @@ void createAccount()//Create Account and Store it in structure acc
 {
     FILE* fp;
     int accno;
-    char fileName[30]="";
-    accno=acc[dataCount-1].accountNumber+1;
-    acc[dataCount].accountNumber=accno;
+    char fileName[30] = "";
+    accno = acc[dataCount-1].accountNumber+1;//acc=100006
+    acc[dataCount].accountNumber = accno;
     printf("Enter your First Name :");
     scanf("%s", acc[dataCount].firstName);
     printf("Enter your Last Name:");
@@ -81,7 +120,7 @@ void createAccount()//Create Account and Store it in structure acc
     printf("Enter the Opening Balance:");
     scanf("%d",&acc[dataCount].balance);
     printf("Your account number is %d\n",accno);
-    getFileName(&fileName[0],accno);
+    getFileName(&fileName[0],accno);// ./Transaction/100006.txt
     fp=fopen(fileName,"w");
     fprintf(fp,"0\t%d\t0\t%d\n",acc[dataCount].balance,acc[dataCount].balance);
     dataCount++;
@@ -122,26 +161,25 @@ void withdrawl()
 {
     FILE* fp;
     char fileName[30];
-    int accNo,pin,i,amt,bal;
-    printf("Enter Acc No:");
-    scanf("%d",&accNo);
-    printf("Enter PIN:");
-    scanf("%d",&pin);
-    i=search(accNo);
-    if(auth(acc[i].pin,pin)==1)
+    int amt,bal,accNo;  
+    printf("Enter Amount to be withdrawn:");
+    scanf("%d",&amt);
+    accNo=acc[userIndex].accountNumber;
+    bal=acc[userIndex].balance;
+    if(bal>=amt)
     {
-        printf("Enter Amount to be withdrawn:");
-        scanf("%d",&amt);
-        bal=acc[i].balance;
-        if(bal>=amt)
-        {
-            acc[i].balance-=amt;
-        }
-    }
-    getFileName(&fileName[0],accNo);
-    fp=fopen(fileName,"a");
-    fprintf(fp,"%d\t0\t%d\t%d\n",bal,amt,acc[i].balance);
-    fclose(fp);
+        acc[userIndex].balance-=amt;
+        printf("Transaction Successful!!\nYour Account balance is %d\n",acc[userIndex].balance);
+        getFileName(&fileName[0],accNo);
+        fp=fopen(fileName,"a");
+        fprintf(fp,"\n%d\t0\t%d\t%d\n",bal,amt,acc[userIndex].balance);
+        fclose(fp);
+    } 
+    else
+    {
+        printf("Insufficient Balance!!\n");
+
+    }  
 }
 int auth(int pin1,int pin2)
 {
@@ -156,19 +194,20 @@ int auth(int pin1,int pin2)
 }
 int search(int accNo)
 {
-    int i;
+    int x=-1,i;
     for(i=0;i<dataCount;i++)
     {
         if(acc[i].accountNumber==accNo)
         {
-            return(i);
+            x=i;
             break;
         }
     }
+    return(x);
 }
-void getFileName(char* fileName,int accNo)
+void getFileName(char* fileName,int accNo)//100006
 {
-    char accstr[10]="";
+    char accstr[10]="";//   ./Transaction/100006.txt
     strcpy(fileName,"./Transaction/");
     intToStr(&accstr[0],accNo);
     strcat(fileName,accstr);
@@ -176,18 +215,39 @@ void getFileName(char* fileName,int accNo)
 }
 void transHistory()
 {
-    int accNo,pin,i,j;
-    printf("Enter Acc No:");
+    int i,j,accNo;
+    accNo=acc[userIndex].accountNumber;
+    importTrans(accNo);
+    for(j=0;j<transCount;j++)
+    {
+        printf("%d\t%d\t%d\t%d\n",trans[j].initalBalance,trans[j].creditAmount,trans[j].debitAmount,trans[j].finalBalance);
+    }
+}
+int login()
+{
+    int accNo,pin,i;
+    printf("Account Number:");
     scanf("%d",&accNo);
-    printf("Enter PIN:");
+    printf("PIN:");
     scanf("%d",&pin);
     i=search(accNo);
-    if(auth(pin,acc[i].pin)==1)
+    if(i>=0)
     {
-        importTrans(accNo);
-        for(j=0;j<transCount;j++)
+        if(pin==acc[i].pin)
         {
-            printf("%d\t%d\t%d\t%d\n",trans[j].initalBalance,trans[j].creditAmount,trans[j].debitAmount,trans[j].finalBalance);
+            userIndex=i;
+            return (1);
+        }
+        else
+        {
+            printf("Incorrect PIN!\n%d %d",pin,acc[i].pin);
+            return (0);
         }
     }
+    else
+    {
+        printf("Account Doesnot Exist!\n");
+        return 0;
+    }
+
 }
