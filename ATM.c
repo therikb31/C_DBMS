@@ -119,6 +119,7 @@ void createAccount()//Create Account and Store it in structure acc
     scanf("%d",&acc[dataCount].pin);
     printf("Enter the Opening Balance:");
     scanf("%d",&acc[dataCount].balance);
+    printf("Your account has been successfully created!!\n");
     printf("Your account number is %d\n",accno);
     getFileName(&fileName[0],accno);// ./Transaction/100006.txt
     fp=fopen(fileName,"w");
