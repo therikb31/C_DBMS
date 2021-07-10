@@ -249,7 +249,7 @@ int login()
         }
         else
         {
-            printf("Incorrect PIN!\n%d %d",pin,acc[i].pin);
+            printf("Incorrect PIN!\n");
             return (0);
         }
     }
