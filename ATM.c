@@ -14,6 +14,7 @@ void transHistory();
 int login();
 void deposit();
 void transferFund();
+void changePIN();
 struct transaction
 {
     int initalBalance;
@@ -36,32 +37,51 @@ int transCount=0;
 int userIndex;
 void main()
 {
+    system("clear");
     importDetails();
     int ch,ch1;
-    printf("Welcome to the Bank Of TINT\n1.Login\n2.Create Account\nEnter your Choice:");
+    printf("+------------------------------------------+\n");
+    printf("|\tWelcome to the Bank Of TINT        |\n");
+    printf("+------------------------------------------+\n\n");
+    printf("1.Login\n2.Create Account\nEnter your Choice:");
     scanf("%d",&ch);
+    system("clear");
     switch(ch)
     {
         case 1:
         if(login()==1)
         {
-            printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\nEnter your choice:");
+            system("clear");
+            printf("+------------------------------------------+\n");
+            printf("|\t\t    HOME                   |\n");
+            printf("+------------------------------------------+\n\n");
+            printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\nEnter your choice:");
             scanf("%d",&ch1);
             switch (ch1)
             {
+                
                 case 1:
+                    system("clear");
                     withdrawl();
                     break;
                 case 2:
+                    system("clear");
                     deposit();
                     break;
                 case 3:
+                    system("clear");
                     transferFund();
                     break;
                 case 4:
+                    system("clear");
                     transHistory();
                     break;
+                case 5:
+                    system("clear");
+                    changePIN();
+                    break;
                 default:
+                    system("clear");
                     printf("Wrong Choice!\n");
                     break;
             }
@@ -227,14 +247,28 @@ void transHistory()
     int i,j,accNo;
     accNo=acc[userIndex].accountNumber;
     importTrans(accNo);
+    if (transCount>0)
+    {
+        printf("+------------------------------------------+\n");
+            printf("|\t     Transaction History           |\n");
+            printf("+------------------------------------------+\n\n");
+        printf("+---------------------------------+\n");
+        printf("|Initial| Credit | Debit  | Total |\n");
+        printf("|Amount | Amount | Amount |Balance|\n");
+        printf("+---------------------------------+\n");
+    }
     for(j=0;j<transCount;j++)
     {
-        printf("%d\t%d\t%d\t%d\n",trans[j].initalBalance,trans[j].creditAmount,trans[j].debitAmount,trans[j].finalBalance);
+        printf("| %d\t| %d\t |%d\t  |%d  |\n",trans[j].initalBalance,trans[j].creditAmount,trans[j].debitAmount,trans[j].finalBalance);
     }
+    printf("+---------------------------------+\n");
 }
 int login()
 {
     int accNo,pin,i;
+    printf("+------------------------------------------+\n");
+    printf("|\t\t Login Page                |\n");
+    printf("+------------------------------------------+\n\n");
     printf("Account Number:");
     scanf("%d",&accNo);
     printf("PIN:");
@@ -310,5 +344,31 @@ void transferFund()
     else
     {
         printf("Invalid Account No!\n");
+    }
+}
+void changePIN()
+{
+    int oPin,nPin1,nPin2;
+    printf("Re-Enter your existing PIN:");
+    scanf("%d",&oPin);
+    if(oPin==acc[userIndex].pin)
+    {
+        printf("Enter New PIN:");
+        scanf("%d",&nPin1);
+        printf("Re-Enter New PIN:");
+        scanf("%d",&nPin2);
+        if(nPin1==nPin2)
+        {
+            acc[userIndex].pin=nPin2;
+            printf("PIN Change Successful!");
+        }
+        else
+        {
+            printf("PIN Mismatch!\n");
+        }
+    }
+    else
+    {
+        printf("Incorrect PIN!\n");
     }
 }
