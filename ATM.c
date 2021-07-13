@@ -15,6 +15,10 @@ int login();
 void deposit();
 void transferFund();
 void changePIN();
+void menu();
+void loginPage();
+int  digitCount(int);
+void spaceGen(char*,int);
 struct transaction
 {
     int initalBalance;
@@ -37,8 +41,12 @@ int transCount=0;
 int userIndex;
 void main()
 {
-    system("clear");
+    loginPage();
+}
+void loginPage()
+{
     importDetails();
+    system("clear");
     int ch,ch1;
     printf("+------------------------------------------+\n");
     printf("|\tWelcome to the Bank Of TINT        |\n");
@@ -49,57 +57,91 @@ void main()
     switch(ch)
     {
         case 1:
-        if(login()==1)
-        {
-            system("clear");
-            printf("+------------------------------------------+\n");
-            printf("|\t\t    HOME                   |\n");
-            printf("+------------------------------------------+\n\n");
-            printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\nEnter your choice:");
+            if(login()==1)
+            {
+                system("clear");
+                menu();
+            }
+            else
+            {
+                printf("Login Unsuccessful!\n");
+            }
+            break;
+        case 2:
+            createAccount();
+            writer();
+            printf("\n\n1.Return to Login Page\n0.Exit\nEnter your choice:");
             scanf("%d",&ch1);
             switch (ch1)
             {
-                
-                case 1:
-                    system("clear");
-                    withdrawl();
-                    break;
-                case 2:
-                    system("clear");
-                    deposit();
-                    break;
-                case 3:
-                    system("clear");
-                    transferFund();
-                    break;
-                case 4:
-                    system("clear");
-                    transHistory();
-                    break;
-                case 5:
-                    system("clear");
-                    changePIN();
-                    break;
-                default:
-                    system("clear");
-                    printf("Wrong Choice!\n");
-                    break;
+            case 1:
+                loginPage();
+                break;
+            case 0:
+                printf("Thank you for Banking with us!\n");
+                break;
+            default:
+                printf("Wrong Choice!");
+                break;
             }
-
-        }
-        else
-        {
-            printf("Login Unsuccessful!\n");
-        }
-        break;
-        case 2:
-            createAccount();
             break;
         default:
             printf("Wrong Choice!");
             break;
     }
+}
+void menu()
+{
+    importDetails();
+    int ch,ch1;
+    printf("+------------------------------------------+\n");
+    printf("|\t\t    HOME                   |\n");
+    printf("+------------------------------------------+\n\n");
+    printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\nEnter your choice:");
+    scanf("%d",&ch1);
+    switch (ch1)
+    {
+        case 1:
+            system("clear");
+            withdrawl();
+            break;
+        case 2:
+            system("clear");
+            deposit();
+            break;
+        case 3:
+            system("clear");
+            transferFund();
+            break;
+        case 4:
+            system("clear");
+            transHistory();
+            break;
+        case 5:
+            system("clear");
+            changePIN();
+            break;
+        default:
+            system("clear");
+            printf("Wrong Choice!\n");
+            break;
+    }
     writer();
+    printf("\n\n1.Return to Home\n0.Exit\nEnter Your choice:");
+    scanf("%d",&ch);
+    switch(ch)
+    {
+        case 1:
+            system("clear");
+            menu();
+            break;
+        case 0:
+            printf("Thank you for Banking with us!\n");
+            break;
+        default:
+            printf("Wrong Choice!");
+            break;
+    }
 }
 void importDetails()//Import data from Account Details
 {
@@ -134,6 +176,7 @@ void importTrans()
 }
 void createAccount()//Create Account and Store it in structure acc 
 {
+    importDetails();
     FILE* fp;
     int accno;
     char fileName[30] = "";
@@ -151,9 +194,10 @@ void createAccount()//Create Account and Store it in structure acc
     printf("Your account number is %d\n",accno);
     getFileName(&fileName[0],accno);// ./Transaction/100006.txt
     fp=fopen(fileName,"w");
-    fprintf(fp,"0\t%d\t0\t%d\n",acc[dataCount].balance,acc[dataCount].balance);
+    fprintf(fp,"0\t%d\t0\t%d",acc[dataCount].balance,acc[dataCount].balance);
     dataCount++;
     fclose(fp); 
+    writer();
 }
 void writer()//Writes all the changes made to Acount Details
 {
@@ -244,24 +288,30 @@ void getFileName(char* fileName,int accNo)//100006
 }
 void transHistory()
 {
-    int i,j,accNo;
+    
+    int i,j,k,accNo;
     accNo=acc[userIndex].accountNumber;
     importTrans(accNo);
     if (transCount>0)
     {
-        printf("+------------------------------------------+\n");
-            printf("|\t     Transaction History           |\n");
-            printf("+------------------------------------------+\n\n");
-        printf("+---------------------------------+\n");
-        printf("|Initial| Credit | Debit  | Total |\n");
-        printf("|Amount | Amount | Amount |Balance|\n");
-        printf("+---------------------------------+\n");
+        printf("+-------------------------------------------+\n");
+            printf("|\t     Transaction History            |\n");
+            printf("+-------------------------------------------+\n\n");
+        printf("  +---------------------------------------+\n");
+        printf("  |Initial  | Credit  | Debit   |  Total  |\n");
+        printf("  |Amount   | Amount  | Amount  | Balance |\n");
+        printf("  +---------------------------------------+\n");
     }
     for(j=0;j<transCount;j++)
     {
-        printf("| %d\t| %d\t |%d\t  |%d  |\n",trans[j].initalBalance,trans[j].creditAmount,trans[j].debitAmount,trans[j].finalBalance);
+        char s1[10]="",s2[10]="",s3[10]="",s4[10]="";
+        spaceGen(&s1[0],trans[j].initalBalance);
+        spaceGen(&s2[0],trans[j].creditAmount);
+        spaceGen(&s3[0],trans[j].debitAmount);
+        spaceGen(&s4[0],trans[j].finalBalance);
+        printf("  |%d%s|%d%s|%d%s|%d%s|\n",trans[j].initalBalance,s1,trans[j].creditAmount,s2,trans[j].debitAmount,s3,trans[j].finalBalance,s4);
     }
-    printf("+---------------------------------+\n");
+    printf("  +---------------------------------------+\n");
 }
 int login()
 {
@@ -307,6 +357,7 @@ void deposit()
     fp=fopen(fileName,"a");
     fprintf(fp,"\n%d\t%d\t0\t%d",bal,amt,acc[userIndex].balance);
     printf("Transaction Successful!!\nYour Account Balance is %d\n",acc[userIndex].balance);
+    fclose(fp);
 }
 void transferFund()
 {
@@ -370,5 +421,30 @@ void changePIN()
     else
     {
         printf("Incorrect PIN!\n");
+    }
+}
+int digitCount(int n)
+{
+    if(n==0)
+    {
+        return(1);
+    }
+    else
+    {
+        int c=0;
+        while(n>0)
+        {
+            c++;
+            n=n/10;
+        }
+        return(c);
+    }
+}
+void spaceGen(char* st,int x)
+{
+    int k;
+    for(k=0;k<9-digitCount(x);k++)
+    {
+        strcat(st," ");
     }
 }
