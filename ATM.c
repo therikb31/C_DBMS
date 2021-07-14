@@ -47,7 +47,7 @@ void loginPage()
 {
     importDetails();
     system("clear");
-    int ch,ch1;
+    int ch,ch1,ch2;
     printf("+------------------------------------------+\n");
     printf("|\tWelcome to the Bank Of TINT        |\n");
     printf("+------------------------------------------+\n\n");
@@ -65,6 +65,20 @@ void loginPage()
             else
             {
                 printf("Login Unsuccessful!\n");
+                printf("\n\n1.Return to Login Page\n0.Exit\nEnter your choice:");
+                scanf("%d",&ch2);
+                switch (ch2)
+                {
+                case 1:
+                    loginPage();
+                    break;
+                case 0:
+                    printf("Thank you for Banking with us!\n");
+                    break;
+                default:
+                    printf("Wrong Choice!");
+                    break;
+                }
             }
             break;
         case 2:
@@ -321,11 +335,11 @@ int login()
     printf("+------------------------------------------+\n\n");
     printf("Account Number:");
     scanf("%d",&accNo);
-    printf("PIN:");
-    scanf("%d",&pin);
     i=search(accNo);
     if(i>=0)
     {
+        printf("PIN:");
+        scanf("%d",&pin);
         if(pin==acc[i].pin)
         {
             userIndex=i;
