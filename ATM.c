@@ -6,6 +6,7 @@ void importTrans();
 void createAccount();
 void writer();
 void intToStr(char*,int);
+int strToInt(char*);
 void withdrawl();
 int auth(int,int);
 int search(int);
@@ -192,8 +193,8 @@ void createAccount()//Create Account and Store it in structure acc
 {
     importDetails();
     FILE* fp;
-    int accno;
-    char fileName[30] = "";
+    int accno,rpin,ch,rbal,ch1;
+    char fileName[30] = "",pin[10],bal[12]="";
     accno = acc[dataCount-1].accountNumber+1;//acc=100006
     acc[dataCount].accountNumber = accno;
     printf("Enter your First Name :");
@@ -201,16 +202,66 @@ void createAccount()//Create Account and Store it in structure acc
     printf("Enter your Last Name:");
     scanf("%s",acc[dataCount].lastName);
     printf("Enter Pin:");
-    scanf("%d",&acc[dataCount].pin);
-    printf("Enter the Opening Balance:");
-    scanf("%d",&acc[dataCount].balance);
-    printf("Your account has been successfully created!!\n");
-    printf("Your account number is %d\n",accno);
-    getFileName(&fileName[0],accno);// ./Transaction/100006.txt
-    fp=fopen(fileName,"w");
-    fprintf(fp,"0\t%d\t0\t%d",acc[dataCount].balance,acc[dataCount].balance);
-    dataCount++;
-    fclose(fp); 
+    scanf("%s",pin);
+    rpin=strToInt(&pin[0]);
+    if(rpin>=0)
+    {
+        acc[dataCount].pin=rpin;
+        printf("Enter the Opening Balance:");
+        scanf("%s",bal);
+        rbal=strToInt(&bal[0]);
+        if(rbal>=0)
+        {
+            acc[dataCount].balance=rbal;
+            printf("Your account has been successfully created!!\n");
+            printf("Your account number is %d\n",accno);
+            getFileName(&fileName[0],accno);// ./Transaction/100006.txt
+            fp=fopen(fileName,"w");
+            fprintf(fp,"0\t%d\t0\t%d",acc[dataCount].balance,acc[dataCount].balance);
+            dataCount++;
+            fclose(fp);
+        }
+        else
+        {
+            printf("Please enter a numeric balance!\n");
+            printf("\n\n1.Retry Creating Account\n0.Exit\nEnter Your Choice:");
+            scanf("%d",&ch1);
+            switch (ch1)
+            {
+                case 1:
+                    system("clear");
+                    createAccount();
+                    break;
+                case 0:
+                    printf("Thank you for Visiting Us!\n");
+                    break;
+                default:
+                    printf("Wrong Choice!\n");
+                    break;
+            }
+        }
+         
+    }
+    else
+    {
+        printf("Please enter a numeric pin!\n");
+        printf("\n\n1.Retry Creating Account\n0.Exit\nEnter Your Choice:");
+        scanf("%d",&ch);
+        switch (ch)
+        {
+            case 1:
+                system("clear");
+                createAccount();
+                break;
+            case 0:
+                printf("Thank you for Visiting Us!\n");
+                break;
+            default:
+                printf("Wrong Choice!\n");
+                break;
+        }
+    }
+    
     writer();
 }
 void writer()//Writes all the changes made to Acount Details
@@ -461,4 +512,23 @@ void spaceGen(char* st,int x)
     {
         strcat(st," ");
     }
+}
+int strToInt(char *st)
+{
+    int x=0,i=0,a;
+    while(st[i]!='\0')
+    {
+        a=(int)st[i];
+        if(a>=48 && a<=57)
+        {
+            x=(x*10)+(a-48);
+            i++;
+        }
+        else
+        {
+            x=-1;
+            break;
+        }
+    }
+    return(x);
 }
