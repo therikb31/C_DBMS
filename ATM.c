@@ -67,8 +67,8 @@ void loginPage()
 {
     importDetails();
 
-    //Clears the previous terminal commands 
-    system("clear");
+    //cls the previous terminal commands 
+    system("cls");
 
     int ch,ch1,ch2;
     printf("+------------------------------------------+\n");
@@ -78,7 +78,7 @@ void loginPage()
     //Prompts the user to enter a choice
     printf("1.Login\n2.Create Account\nEnter your Choice:");
     scanf("%d",&ch);
-    system("clear");
+    system("cls");
     switch(ch)
     {
         case 1:
@@ -87,7 +87,7 @@ void loginPage()
             if(login()==1)
             {
                 //If login is successfull, the user is redirected to the Menu
-                system("clear");
+                system("cls");
                 menu();
             }
             else
@@ -157,27 +157,27 @@ void menu()
     switch (ch1)
     {
         case 1:
-            system("clear");
+            system("cls");
             withdrawl();
             break;
         case 2:
-            system("clear");
+            system("cls");
             deposit();
             break;
         case 3:
-            system("clear");
+            system("cls");
             transferFund();
             break;
         case 4:
-            system("clear");
+            system("cls");
             transHistory();
             break;
         case 5:
-            system("clear");
+            system("cls");
             changePIN();
             break;
         default:
-            system("clear");
+            system("cls");
             printf("Wrong Choice!\n");
             break;
     }
@@ -191,7 +191,7 @@ void menu()
     switch(ch)
     {
         case 1:
-            system("clear");
+            system("cls");
             menu();
             break;
         case 0:
@@ -340,7 +340,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("clear");
+                    system("cls");
                     createAccount();
                     break;
                 case 0:
@@ -362,7 +362,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 createAccount();
                 break;
             case 0:
@@ -594,39 +594,60 @@ int login()
 
 
 
-//used to perform amount withdrawl from account
+//used to deposit amount to the account
 void deposit()
 {
     FILE* fp;
-    int amt,bal,accNo;
-    char fileName[30];
+    int bal,accNo,ch;
+    char fileName[30],amt[12];
 
     printf("Deposit Amount:");
-    scanf("%d",&amt);
+    scanf("%s",amt);
+    int Amt=strToInt(&amt[0]);
+    if(Amt>=0)
+    {
+            //fetch current account balance
+             bal = acc[userIndex].balance;
 
-    //fetch current account balance
-    bal = acc[userIndex].balance;
+            //fetch account number of current user
+            accNo = acc[userIndex].accountNumber;
 
-    //fetch account number of current user
-    accNo = acc[userIndex].accountNumber;
+            //increase account balance by entered amount
+            acc[userIndex].balance += Amt;
 
-    //increase account balance by entered amount
-    acc[userIndex].balance += amt;
+             //fetch the required filename and store it in fileName
+             getFileName(&fileName[0],accNo);
 
-    //fetch the required filename and store it in fileName
-    getFileName(&fileName[0],accNo);
+             //open required file in append mode
+             fp=fopen(fileName,"a");
 
-    //open required file in append mode
-    fp=fopen(fileName,"a");
+            //add the deposit made to transaction history
+            fprintf(fp,"\n%d\t%d\t0\t%d",bal,Amt,acc[userIndex].balance);
 
-    //add the deposit made to transaction history
-    fprintf(fp,"\n%d\t%d\t0\t%d",bal,amt,acc[userIndex].balance);
+            //print account balance
+              printf("Transaction Successful!!\nYour Account Balance is %d\n",acc[userIndex].balance);
 
-    //print account balance
-    printf("Transaction Successful!!\nYour Account Balance is %d\n",acc[userIndex].balance);
-
-    //close the file to save changes
-    fclose(fp);
+            //close the file to save changes
+             fclose(fp);
+    }
+    else{
+           printf("Enter Valid Amount\n");
+            printf("1.Retry\n0.Exit\nEnter your choice:");
+            scanf("%d",&ch);
+            switch(ch)
+            {
+                case 1:
+                   system("cls");
+                   deposit();
+                   break;
+                case 0:
+                   printf("Thank you for Banking with Us!!"); 
+                   break;
+                default:  
+                    printf("Wrong Choice");
+                    break;   
+            }
+        }
 }
 
 
@@ -635,7 +656,7 @@ void deposit()
 void transferFund()
 {
     FILE *fp;
-    char fileName[30]="",recFileName[30]="";
+    char fileName[30]="",recFileName[30]="",rAn[10]="";
     int recAccNo,recUserIndex=-1,i,tamt,bal,recBal;
 
     //fetch balance of sender's account 
@@ -643,7 +664,8 @@ void transferFund()
 
     //prompt user to enter reciever's account number
     printf("Reciever's Account No:");
-    scanf("%d",&recAccNo);
+    scanf("%s",rAn);
+    recAccNo=strToInt(&rAn[0]);
 
     //search for reciever's account number
     for(i=0;i<dataCount;i++)
@@ -656,7 +678,7 @@ void transferFund()
         }
     }
     //if account is found, recUserIndex will have a non negative value 
-    if (recUserIndex >= 0)
+    if (recUserIndex >= 0 && recAccNo!=acc[userIndex].accountNumber && recAccNo>=0)
     {
         //fetch balance of reciever's account 
         recBal = acc[recUserIndex].balance;
@@ -698,32 +720,60 @@ void transferFund()
 //changes the pin of given user
 void changePIN()
 {
-    int oPin,nPin1,nPin2;
+    int ch;
+    char oPin[10], nPin1[10],nPin2[10];
 
     //prompt user to re-enter existing pin
     printf("Re-Enter your existing PIN:");
-    scanf("%d",&oPin);
+    scanf("%s",oPin);
+    int op=strToInt(&oPin[0]);
 
     //check whether the entered pin matches the original pin
-    if(oPin==acc[userIndex].pin)
+    if(op==acc[userIndex].pin && op>=0)
     {
         //prompt user to enter pin twice
         printf("Enter New PIN:");
-        scanf("%d",&nPin1);
-        printf("Re-Enter New PIN:");
-        scanf("%d",&nPin2);
+        scanf("%s",nPin1);
+        int p=strToInt(&nPin1[0]);
+        if(p>=0)
+        {
+           printf("Re-Enter New PIN:");
+           scanf("%s",nPin2);
+           int p1=strToInt(&nPin2[0]);
 
         
-        if(nPin1==nPin2)
-        {
+            if(p==p1)
+             {
             //if both the pin matches, we update the pin in the structure
-            acc[userIndex].pin=nPin2;
-            printf("PIN Change Successful!");
+              acc[userIndex].pin=p1;
+              printf("PIN Change Successful!");
+             }
+            else
+            {
+              printf("PIN Mismatch!\n");
+            }
         }
         else
         {
-            printf("PIN Mismatch!\n");
-        }
+            printf("Enter valid Pin\n");
+            printf("1.Retry\n0.Exit\nEnter your choice:");
+            scanf("%d",&ch);
+            switch(ch)
+            {
+                case 1:
+                   system("cls");
+                   changePIN();
+                   break;
+                case 0:
+                   printf("Thank you for Banking with Us!!"); 
+                   break;
+                default:  
+                    printf("Wrong Choice");
+                    break;   
+            }
+
+        }    
+
     }
     else
     {
