@@ -5,23 +5,22 @@
 //Declaring the functions used in this program
 void importDetails();
 void importTrans();
-void createAccount();
 void writer();
-void intToStr(char*,int);
-int strToInt(char*);
+void loginPage();
+int  login();
+void createAccount();
+void menu();
 void withdrawl();
-int search(int);
-void getFileName(char*,int);
-void transHistory();
-int login();
 void deposit();
 void transferFund();
+void transHistory();
 void changePIN();
-void menu();
-void loginPage();
+int  search(int);
+void getFileName(char*,int);
+void intToStr(char*,int);
+int  strToInt(char*);
 int  digitCount(int);
 void spaceGen(char*,int);
-
 //Creating a structure of datatype 'transaction'
 struct transaction
 {
@@ -62,9 +61,101 @@ void main()
     loginPage();
 }
 
+//reads the data stored in accDet.txt and stores it in structure variable acc
+void importDetails()
+{
+    // author: Omra Akhtar
+
+    FILE *fp;
+    int i=0; 
+
+    //the file addDet is open in read mode
+    fp=fopen("accDet.txt","r");
+
+
+    while(!feof(fp))
+    {
+        //reads the data recordwise and stores it in 'i'th index of acc
+        fscanf(fp,"%d %s %s %d %d",&acc[i].accountNumber,acc[i].firstName,acc[i].lastName,&acc[i].pin,&acc[i].balance);
+        i++;
+    }
+    //the final value of i gives us the number of records in accDet.txt
+    dataCount=i;
+
+    fclose(fp);
+}
+
+
+//reads the transactions of a given userIndex and stores it in structure variable trans
+void importTrans()
+{
+    // author: Omra Akhtar
+
+    FILE* fp;
+    int accNo,i=0;
+    char fileName[30]="";
+
+    //fetches the account number of the user currently logged in
+    accNo = acc[userIndex].accountNumber;
+
+
+    //gives us the required filename to access the transactions of a given account number
+    getFileName(&fileName[0],accNo);
+
+
+    //opens the requires file that contains the transaction details of the user
+    fp=fopen(fileName,"r");
+
+
+    while(!feof(fp))
+    {
+        //reads the file recorswise and stores the data in structure variable trans
+        fscanf(fp,"%d %d %d %d",&trans[i].initalBalance,&trans[i].creditAmount,&trans[i].debitAmount,&trans[i].finalBalance);
+        i++;
+    }
+
+
+    //the final value of i gives us the number of transaction records in the given file
+    transCount=i;
+
+
+    fclose(fp);
+}
+
+//Writes all the changes made to structure acc into the file accDet.txt
+void writer()
+{
+    //author: Omra Akhtar
+
+    FILE *fp;
+    int i;
+
+
+    //the file accDet.txt is open in write mode
+    fp=fopen("accDet.txt","w");
+
+    
+    for (i=0 ; i <dataCount ; i++)
+    {
+        //the data in structures is written into the file recordwise
+        fprintf(fp,"%d\t%s\t%s\t%d\t%d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance);
+
+        //we avoid printing a blank line after the last record
+        if(i < dataCount-1 )
+        {
+            fprintf(fp,"\n");
+        }
+    }
+
+    fclose(fp);
+}
+
 //Displays the login page 
 void loginPage()
 {
+    //author: Ananya Verma
+
+    //import details from accDet.txt to structure acc
     importDetails();
 
     //clear the previous terminal commands 
@@ -139,135 +230,79 @@ void loginPage()
     }
 }
 
-//Displays the homepage
-void menu()
+//prompt the user for login details
+int login()
 {
+    //author: Omra Akhtar
 
-    // imports the data from accDet.txt and stores it in the structure variable acc
-    importDetails();
-
-
-    // user is given a choice to perform some actions on his account 
-    int  ch,ch1,l;
+    int accNo,pin,i,ch,ch1;
+    char pinStr[10]="",accNoStr[10]=""; 
+    //prints the page header
     printf("+------------------------------------------+\n");
-    printf("|\t\t    HOME                   |\n");
+    printf("|\t\t Login Page                |\n");
     printf("+------------------------------------------+\n\n");
 
-    printf("Welcome %s %s,\n\n",acc[userIndex].firstName,acc[userIndex].lastName);
-    printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\nEnter your choice:");
-    scanf("%d",&ch1);
-    switch (ch1)
+    //ask the user for the account number
+    printf("Account Number:");    
+    scanf("%s",accNoStr);
+    accNo = strToInt(&accNoStr[0]);
+
+    if(accNo >= 0)
     {
-        case 1:
-            system("clear");
-            withdrawl();
-            break;
-        case 2:
-            system("clear");
-            deposit();
-            break;
-        case 3:
-            system("clear");
-            transferFund();
-            break;
-        case 4:
-            system("clear");
-            transHistory();
-            break;
-        case 5:
-            system("clear");
-            changePIN();
-            break;
-        default:
-            system("clear");
-            printf("Wrong Choice!\n");
-            break;
+        //search for the account number in structure acc
+        i=search(accNo);
+
+        //if account is found in database, we proceed with login
+        if(i>=0)
+        {
+            //ask the user for pin
+            printf("PIN:");
+            scanf("%s",pinStr);
+            pin=strToInt(&pinStr[0]);
+
+            if (pin >= 0)
+            {
+                //check whether the user entered pin matches the pin in structure acc
+                if(pin==acc[i].pin)
+                {   
+                    //if true, the index of account in structure acc is stored in userIndex
+                    userIndex=i;
+
+                    //the function returns 1 which indicates authentication successful
+                    return (1);
+                }
+                else
+                {
+                    printf("Incorrect PIN!\n");
+
+                    //as the user entered pin doesnot match the actual pin,
+                    //the function returns 0 which indicate authentication failed
+                    return (0);
+                }
+            }
+            else
+            {
+                printf("Enter Valid PIN\n");
+            }
+        }
+
+        //if the account is not found in the structure, error message is displayed
+        else
+        {
+            printf("Account Doesnot Exist!\n");
+            return 0;
+        }   
     }
-
-    // writes the changes made to the acc 
-    writer();
-
-    // user is given a choice to return to home or exit
-    printf("\n\n1.Return to Home\n0.Exit\nEnter Your choice:");
-    scanf("%d",&ch);
-    switch(ch)
+    else
     {
-        case 1:
-            system("clear");
-            menu();
-            break;
-        case 0:
-            printf("Thank you for Banking with us!\n");
-            break;
-        default:
-            printf("Wrong Choice!");
-            break;
+        printf("Enter Valid Account Number\n");
     }
 }
-
-
-//reads the data stored in accDet.txt and stores it in structure variable acc
-void importDetails()
-{
-    FILE *fp;
-    int i=0; 
-
-
-    //the file addDet is open in read mode
-    fp=fopen("accDet.txt","r");
-
-
-    while(!feof(fp))
-    {
-        //reads the data recordwise and stores it in 'i'th index of acc
-        fscanf(fp,"%d %s %s %d %d",&acc[i].accountNumber,acc[i].firstName,acc[i].lastName,&acc[i].pin,&acc[i].balance);
-        i++;
-    }
-    //the final value of i gives us the number of records in accDet.txt
-    dataCount=i;
-
-    fclose(fp);
-}
-
-
-//reads the transactions of a given userIndex and stores it in structure variable trans
-void importTrans()
-{
-    FILE* fp;
-    int accNo,i=0;
-    char fileName[30]="";
-
-    //fetches the account number of the user currently logged in
-    accNo = acc[userIndex].accountNumber;
-
-
-    //gives us the required filename to access the transactions of a given account number
-    getFileName(&fileName[0],accNo);
-
-
-    //opens the requires file that contains the transaction details of the user
-    fp=fopen(fileName,"r");
-
-
-    while(!feof(fp))
-    {
-        //reads the file recorswise and stores the data in structure variable trans
-        fscanf(fp,"%d %d %d %d",&trans[i].initalBalance,&trans[i].creditAmount,&trans[i].debitAmount,&trans[i].finalBalance);
-        i++;
-    }
-
-
-    //the final value of i gives us the number of transaction records in the given file
-    transCount=i;
-
-
-    fclose(fp);
-}
-
 
 //adds user entered details to the structure acc
 void createAccount()
 {
+    //author: Rik Biswas
 
     //imports the data from accDet.txt
     importDetails();
@@ -381,36 +416,78 @@ void createAccount()
 }
 
 
-//Writes all the changes made to structure acc into the file accDet.txt
-void writer()
+//Displays the homepage
+void menu()
 {
-    FILE *fp;
-    int i;
+    //author: Ananya Verma
+
+    // imports the data from accDet.txt and stores it in the structure variable acc
+    importDetails();
 
 
-    //the file accDet.txt is open in write mode
-    fp=fopen("accDet.txt","w");
+    // user is given a choice to perform some actions on his account 
+    int  ch,ch1,l;
+    printf("+------------------------------------------+\n");
+    printf("|\t\t    HOME                   |\n");
+    printf("+------------------------------------------+\n\n");
 
-    
-    for (i=0 ; i <dataCount ; i++)
+    printf("Welcome %s %s,\n\n",acc[userIndex].firstName,acc[userIndex].lastName);
+    printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\nEnter your choice:");
+    scanf("%d",&ch1);
+    switch (ch1)
     {
-        //the data in structures is written into the file recordwise
-        fprintf(fp,"%d\t%s\t%s\t%d\t%d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance);
-
-        //we avoid printing a blank line after the last record
-        if(i < dataCount-1 )
-        {
-            fprintf(fp,"\n");
-        }
+        case 1:
+            system("clear");
+            withdrawl();
+            break;
+        case 2:
+            system("clear");
+            deposit();
+            break;
+        case 3:
+            system("clear");
+            transferFund();
+            break;
+        case 4:
+            system("clear");
+            transHistory();
+            break;
+        case 5:
+            system("clear");
+            changePIN();
+            break;
+        default:
+            system("clear");
+            printf("Wrong Choice!\n");
+            break;
     }
 
-    fclose(fp);
+    // writes the changes made to the acc 
+    writer();
+
+    // user is given a choice to return to home or exit
+    printf("\n\n1.Return to Home\n0.Exit\nEnter Your choice:");
+    scanf("%d",&ch);
+    switch(ch)
+    {
+        case 1:
+            system("clear");
+            menu();
+            break;
+        case 0:
+            printf("\n\nThank you for Banking with us!\n");
+            break;
+        default:
+            printf("Wrong Choice!");
+            break;
+    }
 }
 
 
 //used to perform amount withdrawl from account
 void withdrawl()
 {
+    //author: Rik Biswas
 
     FILE* fp;
     char fileName[30];
@@ -455,168 +532,11 @@ void withdrawl()
     }  
 }
 
-
-//checks whether given account number exists in structure acc
-int search(int accNo)
-{
-    int x =- 1,i;
-
-    //loop to traverse structure acc with 'dataCount' records
-    for ( i=0 ; i<dataCount ; i++)
-    {
-        //if account is found, value of flag changes and loop breaks
-        if (acc[i].accountNumber == accNo)
-        {
-            x=i;
-            break;
-        }
-    }
-
-    //the flag value is returned. negative return value indicates missing account 
-    return(x);
-}
-
-
-
-//sandwiches the accNo with folder directory and file extension
-void getFileName(char* fileName,int accNo)
-{
-    //create expty string accstr
-    char accstr[10]="";
-
-    //copy directory name to the string fileName
-    strcpy(fileName,"./Transaction/");
-
-    //convert integer accNo to string and store in accstr
-    intToStr(&accstr[0],accNo);
-
-    //copy accstr to the string fileName
-    strcat(fileName,accstr);
-
-    //copy extension to the string fileName
-    strcat(fileName,".txt");
-}
-
-
-
-//used to print the transaction history of given account number
-void transHistory()
-{
-    
-    int i,j,k,accNo;
-
-    //fetch the account number of current user
-    accNo = acc[userIndex].accountNumber;
-
-    //imports the transaction of given accountNumber and stores it in structure trans
-    importTrans(accNo);
-
-    //prints the page header    
-    printf("+-------------------------------------------+\n");
-    printf("|\t     Transaction History            |\n");
-    printf("+-------------------------------------------+\n\n");
-
-    //prnits the table header
-    printf("  +---------------------------------------+\n");
-    printf("  |Initial  | Credit  | Debit   |  Total  |\n");
-    printf("  |Amount   | Amount  | Amount  | Balance |\n");
-    printf("  +---------------------------------------+\n");
-
-
-    for ( j=0 ; j<transCount ; j++)
-    {
-        char s1[10]="",s2[10]="",s3[10]="",s4[10]="";
-
-        //generates adequate spaces after digits to maintain tabular structure
-        spaceGen(&s1[0],trans[j].initalBalance);
-        spaceGen(&s2[0],trans[j].creditAmount);
-        spaceGen(&s3[0],trans[j].debitAmount);
-        spaceGen(&s4[0],trans[j].finalBalance);
-
-        //prints the transaction details recordwise
-        printf("  |%d%s|%d%s|%d%s|%d%s|\n",trans[j].initalBalance,s1,trans[j].creditAmount,s2,trans[j].debitAmount,s3,trans[j].finalBalance,s4);
-    }
-     
-    //prints the table footer
-    printf("  +---------------------------------------+\n");
-}
-
-
-
-//prompt the user for login details
-int login()
-{
-    int accNo,pin,i,ch,ch1;
-    char pinStr[10]="",accNoStr[10]=""; 
-    //prints the page header
-    printf("+------------------------------------------+\n");
-    printf("|\t\t Login Page                |\n");
-    printf("+------------------------------------------+\n\n");
-
-    //ask the user for the account number
-    printf("Account Number:");    
-    scanf("%s",accNoStr);
-    accNo = strToInt(&accNoStr[0]);
-
-    if(accNo >= 0)
-    {
-        //search for the account number in structure acc
-        i=search(accNo);
-
-        //if account is found in database, we proceed with login
-        if(i>=0)
-        {
-            //ask the user for pin
-            printf("PIN:");
-            scanf("%s",pinStr);
-            pin=strToInt(&pinStr[0]);
-
-            if (pin >= 0)
-            {
-                //check whether the user entered pin matches the pin in structure acc
-                if(pin==acc[i].pin)
-                {   
-                    //if true, the index of account in structure acc is stored in userIndex
-                    userIndex=i;
-
-                    //the function returns 1 which indicates authentication successful
-                    return (1);
-                }
-                else
-                {
-                    printf("Incorrect PIN!\n");
-
-                    //as the user entered pin doesnot match the actual pin,
-                    //the function returns 0 which indicate authentication failed
-                    return (0);
-                }
-            }
-            else
-            {
-                printf("Enter Valid PIN\n");
-            }
-        }
-
-        //if the account is not found in the structure, error message is displayed
-        else
-        {
-            printf("Account Doesnot Exist!\n");
-            return 0;
-        }   
-    }
-    else
-    {
-        printf("Enter Valid Account Number\n");
-    }
-
-    
-}
-
-
-
 //used to deposit amount to the account
 void deposit()
 {
+    //author: Rik Biswas
+
     FILE* fp;
     int bal,accNo,ch;
     char fileName[30],amt[12];
@@ -670,11 +590,11 @@ void deposit()
         }
 }
 
-
-
 //used to transfer amount from current account to another account
 void transferFund()
 {
+    //author: Rik Biswas
+
     FILE *fp;
     char fileName[30]="",recFileName[30]="",rAn[10]="", strAmt[10]="";
     int recAccNo,recUserIndex=-1,i,tamt,bal,recBal;
@@ -762,11 +682,54 @@ void transferFund()
     }
 }
 
+//used to print the transaction history of given account number
+void transHistory()
+{
+    //author: Rik Biswas
+    
+    int i,j,k,accNo;
 
+    //fetch the account number of current user
+    accNo = acc[userIndex].accountNumber;
+
+    //imports the transaction of given accountNumber and stores it in structure trans
+    importTrans(accNo);
+
+    //prints the page header    
+    printf("+-------------------------------------------+\n");
+    printf("|\t     Transaction History            |\n");
+    printf("+-------------------------------------------+\n\n");
+
+    //prnits the table header
+    printf("  +---------------------------------------+\n");
+    printf("  |Initial  | Credit  | Debit   |  Total  |\n");
+    printf("  |Amount   | Amount  | Amount  | Balance |\n");
+    printf("  +---------------------------------------+\n");
+
+
+    for ( j=0 ; j<transCount ; j++)
+    {
+        char s1[10]="",s2[10]="",s3[10]="",s4[10]="";
+
+        //generates adequate spaces after digits to maintain tabular structure
+        spaceGen(&s1[0],trans[j].initalBalance);
+        spaceGen(&s2[0],trans[j].creditAmount);
+        spaceGen(&s3[0],trans[j].debitAmount);
+        spaceGen(&s4[0],trans[j].finalBalance);
+
+        //prints the transaction details recordwise
+        printf("  |%d%s|%d%s|%d%s|%d%s|\n",trans[j].initalBalance,s1,trans[j].creditAmount,s2,trans[j].debitAmount,s3,trans[j].finalBalance,s4);
+    }
+     
+    //prints the table footer
+    printf("  +---------------------------------------+\n");
+}
 
 //changes the pin of given user
 void changePIN()
 {
+    //author: Ananya verma
+
     int ch;
     char oPin[10], nPin1[10],nPin2[10];
 
@@ -828,11 +791,53 @@ void changePIN()
     }
 }
 
+//checks whether given account number exists in structure acc
+int search(int accNo)
+{
+    //author: Ananya verma
 
+    int x =- 1,i;
+
+    //loop to traverse structure acc with 'dataCount' records
+    for ( i=0 ; i<dataCount ; i++)
+    {
+        //if account is found, value of flag changes and loop breaks
+        if (acc[i].accountNumber == accNo)
+        {
+            x=i;
+            break;
+        }
+    }
+
+    //the flag value is returned. negative return value indicates missing account 
+    return(x);
+}
+
+//sandwiches the accNo with folder directory and file extension
+void getFileName(char* fileName,int accNo)
+{
+    //author: Rik Biswas
+
+    //create expty string accstr
+    char accstr[10]="";
+
+    //copy directory name to the string fileName
+    strcpy(fileName,"./Transaction/");
+
+    //convert integer accNo to string and store in accstr
+    intToStr(&accstr[0],accNo);
+
+    //copy accstr to the string fileName
+    strcat(fileName,accstr);
+
+    //copy extension to the string fileName
+    strcat(fileName,".txt");
+}
 
 //returns the number of digits in number sent as parameter
-int digitCount(int n)
+int digitCount(int n)//12345
 {
+    //author: Ananya Verma
     if(n==0)
     {
         return(1);
@@ -853,6 +858,7 @@ int digitCount(int n)
 //generates spaces according to the number of digits
 void spaceGen(char* st,int x)//x=0
 {
+    //author: Rik Biswas
     int k;
     for(k=0;k<9-digitCount(x);k++)
     {
@@ -864,6 +870,7 @@ void spaceGen(char* st,int x)//x=0
 //converts a string to integer and returns it
 int strToInt(char *st)
 {
+    //author: Rik Biswas
     int x=0,i=0,a;
     while(st[i]!='\0')
     {
@@ -890,6 +897,7 @@ int strToInt(char *st)
 //converts a given integer to string and stores it in given address
 void intToStr(char* st,int n)
 {
+    //author: Rik Biswas
     int arr[6],r,c=0,d=0,i;
     
     //extracting digits in reverse order
