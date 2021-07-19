@@ -67,8 +67,8 @@ void loginPage()
 {
     importDetails();
 
-    //cls the previous terminal commands 
-    system("cls");
+    //clear the previous terminal commands 
+    system("clear");
 
     int ch,ch1,ch2;
     printf("+------------------------------------------+\n");
@@ -78,7 +78,7 @@ void loginPage()
     //Prompts the user to enter a choice
     printf("1.Login\n2.Create Account\nEnter your Choice:");
     scanf("%d",&ch);
-    system("cls");
+    system("clear");
     switch(ch)
     {
         case 1:
@@ -87,7 +87,7 @@ void loginPage()
             if(login()==1)
             {
                 //If login is successfull, the user is redirected to the Menu
-                system("cls");
+                system("clear");
                 menu();
             }
             else
@@ -148,36 +148,38 @@ void menu()
 
 
     // user is given a choice to perform some actions on his account 
-    int ch,ch1;
+    int  ch,ch1,l;
     printf("+------------------------------------------+\n");
     printf("|\t\t    HOME                   |\n");
     printf("+------------------------------------------+\n\n");
+
+    printf("Welcome %s %s,\n\n",acc[userIndex].firstName,acc[userIndex].lastName);
     printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\nEnter your choice:");
     scanf("%d",&ch1);
     switch (ch1)
     {
         case 1:
-            system("cls");
+            system("clear");
             withdrawl();
             break;
         case 2:
-            system("cls");
+            system("clear");
             deposit();
             break;
         case 3:
-            system("cls");
+            system("clear");
             transferFund();
             break;
         case 4:
-            system("cls");
+            system("clear");
             transHistory();
             break;
         case 5:
-            system("cls");
+            system("clear");
             changePIN();
             break;
         default:
-            system("cls");
+            system("clear");
             printf("Wrong Choice!\n");
             break;
     }
@@ -191,7 +193,7 @@ void menu()
     switch(ch)
     {
         case 1:
-            system("cls");
+            system("clear");
             menu();
             break;
         case 0:
@@ -340,7 +342,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("cls");
+                    system("clear");
                     createAccount();
                     break;
                 case 0:
@@ -362,7 +364,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 createAccount();
                 break;
             case 0:
@@ -544,8 +546,8 @@ void transHistory()
 //prompt the user for login details
 int login()
 {
-    int accNo,pin,i;
-
+    int accNo,pin,i,ch,ch1;
+    char pinStr[10]="",accNoStr[10]=""; 
     //prints the page header
     printf("+------------------------------------------+\n");
     printf("|\t\t Login Page                |\n");
@@ -553,43 +555,61 @@ int login()
 
     //ask the user for the account number
     printf("Account Number:");    
-    scanf("%d",&accNo);
+    scanf("%s",accNoStr);
+    accNo = strToInt(&accNoStr[0]);
 
-    //search for the account number in structure acc
-    i=search(accNo);
-
-    //if account is found in database, we proceed with login
-    if(i>=0)
+    if(accNo >= 0)
     {
-        //ask the user for pin
-        printf("PIN:");
-        scanf("%d",&pin);
+        //search for the account number in structure acc
+        i=search(accNo);
 
-        //check whether the user entered pin matches the pin in structure acc
-        if(pin==acc[i].pin)
-        {   
-            //if true, the index of account in structure acc is stored in userIndex
-            userIndex=i;
+        //if account is found in database, we proceed with login
+        if(i>=0)
+        {
+            //ask the user for pin
+            printf("PIN:");
+            scanf("%s",pinStr);
+            pin=strToInt(&pinStr[0]);
 
-            //the function returns 1 which indicates authentication successful
-            return (1);
+            if (pin >= 0)
+            {
+                //check whether the user entered pin matches the pin in structure acc
+                if(pin==acc[i].pin)
+                {   
+                    //if true, the index of account in structure acc is stored in userIndex
+                    userIndex=i;
+
+                    //the function returns 1 which indicates authentication successful
+                    return (1);
+                }
+                else
+                {
+                    printf("Incorrect PIN!\n");
+
+                    //as the user entered pin doesnot match the actual pin,
+                    //the function returns 0 which indicate authentication failed
+                    return (0);
+                }
+            }
+            else
+            {
+                printf("Enter Valid PIN\n");
+            }
         }
+
+        //if the account is not found in the structure, error message is displayed
         else
         {
-            printf("Incorrect PIN!\n");
-
-            //as the user entered pin doesnot match the actual pin,
-            //the function returns 0 which indicate authentication failed
-            return (0);
-        }
+            printf("Account Doesnot Exist!\n");
+            return 0;
+        }   
     }
-
-    //if the account is not found in the structure, error message is displayed
     else
     {
-        printf("Account Doesnot Exist!\n");
-        return 0;
+        printf("Enter Valid Account Number\n");
     }
+
+    
 }
 
 
@@ -637,7 +657,7 @@ void deposit()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    deposit();
                    break;
                 case 0:
@@ -656,7 +676,7 @@ void deposit()
 void transferFund()
 {
     FILE *fp;
-    char fileName[30]="",recFileName[30]="",rAn[10]="";
+    char fileName[30]="",recFileName[30]="",rAn[10]="", strAmt[10]="";
     int recAccNo,recUserIndex=-1,i,tamt,bal,recBal;
 
     //fetch balance of sender's account 
@@ -685,28 +705,55 @@ void transferFund()
 
         //prompt the user to enter transfer amount 
         printf("Trasfer Amount:");
-        scanf("%d",&tamt);
+        scanf("%s",strAmt);
+        tamt = strToInt(&strAmt[0]);
 
-        //reduce sender's balance 
-        acc[userIndex].balance -= tamt;
+        if (tamt >= 0)
+        {
+            //reduce sender's balance 
+            acc[userIndex].balance -= tamt;
 
-        //add transaction to sender's transaction history
-        getFileName(&fileName[0],acc[userIndex].accountNumber);
-        fp=fopen(fileName,"a");
-        fprintf(fp,"\n%d\t0\t%d\t%d",bal,tamt,acc[userIndex].balance);
-        fclose(fp);
+            //add transaction to sender's transaction history
+            getFileName(&fileName[0],acc[userIndex].accountNumber);
+            fp=fopen(fileName,"a");
+            fprintf(fp,"\n%d\t0\t%d\t%d",bal,tamt,acc[userIndex].balance);
+            fclose(fp);
 
-        //increase reciever's balance
-        acc[recUserIndex].balance += tamt;
+            //increase reciever's balance
+            acc[recUserIndex].balance += tamt;
 
-        //add transaction to sender's transaction history
-        getFileName(&recFileName[0],acc[recUserIndex].accountNumber);
-        fp=fopen(recFileName,"a");
-        fprintf(fp,"\n%d\t%d\t0\t%d",recBal,tamt,acc[recUserIndex].balance);
-        fclose(fp);
+            //add transaction to sender's transaction history
+            getFileName(&recFileName[0],acc[recUserIndex].accountNumber);
+            fp=fopen(recFileName,"a");
+            fprintf(fp,"\n%d\t%d\t0\t%d",recBal,tamt,acc[recUserIndex].balance);
+            fclose(fp);
 
-        //print success message
-        printf("Trasfer Successfull!\nYour Account Balance is %d\n",acc[userIndex].balance);
+            //print success message
+            printf("Trasfer Successfull!\nYour Account Balance is %d\n",acc[userIndex].balance);
+        }
+        else
+        {
+            int ch;
+            printf("Enter Valid Amount\n");
+            printf("1.Retry\n0.Exit\nEnter your choice:");
+            scanf("%d",&ch);
+            switch(ch)
+            {
+                case 1:
+                   system("clear");
+                   transferFund();
+                   break;
+                case 0:
+                   printf("Thank you for Banking with Us!!"); 
+                   break;
+                default:  
+                    printf("Wrong Choice");
+                    break;   
+            }
+
+        }
+
+        
     }
     //if account is not found, recUserIndex will have a negative value 
     else
@@ -761,7 +808,7 @@ void changePIN()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    changePIN();
                    break;
                 case 0:
@@ -804,7 +851,7 @@ int digitCount(int n)
 
 
 //generates spaces according to the number of digits
-void spaceGen(char* st,int x)
+void spaceGen(char* st,int x)//x=0
 {
     int k;
     for(k=0;k<9-digitCount(x);k++)
