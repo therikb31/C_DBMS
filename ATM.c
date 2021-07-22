@@ -160,8 +160,8 @@ void loginPage()
     //import details from accDet.txt to structure acc
     importDetails();
 
-    //cls the previous terminal commands 
-    system("cls");
+    //clear the previous terminal commands 
+    system("clear");
 
     int ch,ch1,ch2;
     printf("+------------------------------------------+\n");
@@ -171,7 +171,7 @@ void loginPage()
     //Prompts the user to enter a choice
     printf("1.Login\n2.Create Account\n0.Exit\nEnter your Choice:");
     scanf("%d",&ch);
-    system("cls");
+    system("clear");
     switch(ch)
     {
         case 1:
@@ -180,7 +180,7 @@ void loginPage()
             if(login()==1)
             {
                 //If login is successfull, the user is redirected to the Menu
-                system("cls");
+                system("clear");
                 menu();
             }
             else
@@ -226,7 +226,6 @@ void loginPage()
             }
             break;
         case 0:
-  
                 printf("Thank you for Banking with us!\n");
                 break;
 
@@ -359,7 +358,7 @@ void createAccount()
             // a file of filename <accno>.txt has to be created in the folder 'transaction'
             // to store the transactions made by the user. This function is used to generate
             // the appropriate filename with respect to the account number
-            getFileName(&fileName[0],accno);
+            getFileName(&fileName[0],accno);// ./Transaction/100006.txt
 
 
             //required file is opened in write mode
@@ -383,7 +382,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("cls");
+                    system("clear");
                     createAccount();
                     break;
                 case 0:
@@ -405,7 +404,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 createAccount();
                 break;
             case 0:
@@ -432,7 +431,7 @@ void menu()
 
 
     // user is given a choice to perform some actions on his account 
-    int  ch,ch1,l;
+    int  ch,ch1,l,f=0;
     printf("+------------------------------------------+\n");
     printf("|\t\t    HOME                   |\n");
     printf("+------------------------------------------+\n\n");
@@ -443,31 +442,32 @@ void menu()
     switch (ch1)
     {
         case 1:
-            system("cls");
+            system("clear");
             withdrawl();
             break;
         case 2:
-            system("cls");
+            system("clear");
             deposit();
             break;
         case 3:
-            system("cls");
+            system("clear");
             transferFund();
             break;
         case 4:
-            system("cls");
+            system("clear");
             transHistory();
             break;
         case 5:
-            system("cls");
+            system("clear");
             changePIN();
             break;
         case 0:
-            system("cls");
+            f=1;
+            system("clear");
             printf("Thank you for banking with us!!\n");
             break;
         default:
-            system("cls");
+            system("clear");
             printf("Wrong Choice!\n");
             break;
     }
@@ -475,22 +475,26 @@ void menu()
     // writes the changes made to the acc 
     writer();
 
-    // user is given a choice to return to home or exit
-    printf("\n\n1.Return to Home\n0.Exit\nEnter Your choice:");
-    scanf("%d",&ch);
-    switch(ch)
+    if(f==0)
     {
-        case 1:
-            system("cls");
-            menu();
-            break;
-        case 0:
-            printf("\n\nThank you for Banking with us!\n");
-            break;
-        default:
-            printf("Wrong Choice!");
-            break;
+        // user is given a choice to return to home or exit
+        printf("\n\n1.Return to Home\n0.Exit\nEnter Your choice:");
+        scanf("%d",&ch);
+        switch(ch)
+        {
+            case 1:
+                system("clear");
+                menu();
+                break;
+            case 0:
+                printf("\n\nThank you for Banking with us!\n");
+                break;
+            default:
+                printf("Wrong Choice!");
+                break;
+        }
     }
+    
 }
 
 
@@ -500,46 +504,71 @@ void withdrawl()
     //author: Rik Biswas
 
     FILE* fp;
-    char fileName[30];
-    int amt,bal,accNo;
+    char fileName[30],stramt[10]="";
+    int amt,bal,accNo,ch;
 
     //promt user to enter values
     printf("Enter Amount to be withdrawn:");
-    scanf("%d",&amt);
+    scanf("%s",stramt);
 
-    //fetch account number of current user
-    accNo = acc[userIndex].accountNumber;
+    amt = strToInt(&stramt[0]);
 
-    //fetch balance of current user
-    bal = acc[userIndex].balance;
-
-    //check whether user has sufficient amount to carrry out the transaction
-    if (bal >= amt)
+    if(amt >= 0)
     {
-        //reduces the balance of user
-        acc[userIndex].balance -= amt;
+        //fetch account number of current user
+        accNo = acc[userIndex].accountNumber;
 
-        //displays current balance after withdrawl
-        printf("Transaction Successful!!\nYour Account balance is %d\n",acc[userIndex].balance);
+        //fetch balance of current user
+        bal = acc[userIndex].balance;
 
-        //fetches the filename for the current account number
-        getFileName(&fileName[0],accNo);
+        //check whether user has sufficient amount to carrry out the transaction
+        if (bal >= amt)
+        {
+            //reduces the balance of user
+            acc[userIndex].balance -= amt;
 
-        //opens the required transaction file in append mode
-        fp=fopen(fileName,"a");
+            //displays current balance after withdrawl
+            printf("Transaction Successful!!\nYour Account balance is %d\n",acc[userIndex].balance);
 
-        //adds the transaction made to the transaction history
-        fprintf(fp,"\n%d\t0\t%d\t%d",bal,amt,acc[userIndex].balance);
+            //fetches the filename for the current account number
+            getFileName(&fileName[0],accNo);
 
-        //close the current file
-        fclose(fp);
+            //opens the required transaction file in append mode
+            fp=fopen(fileName,"a");
+
+            //adds the transaction made to the transaction history
+            fprintf(fp,"\n%d\t0\t%d\t%d",bal,amt,acc[userIndex].balance);
+
+            //close the current file
+            fclose(fp);
+        }
+
+        //if the user has low balance, respective message is printed on the screen 
+        else
+        {
+            printf("Insufficient Balance!!\n");
+        } 
     }
-
-    //if the user has low balance, respective message is printed on the screen 
     else
     {
-        printf("Insufficient Balance!!\n");
-    }  
+        printf("Enter Valid Amount\n");
+        printf("1.Retry\n0.Exit\nEnter your choice:");
+        scanf("%d",&ch);
+        switch(ch)
+        {
+            case 1:
+                system("clear");
+                withdrawl();
+                break;
+            case 0:
+                printf("Thank you for Banking with Us!!"); 
+                break;
+            default:  
+                printf("Wrong Choice");
+                break;   
+        }
+    }
+    
 }
 
 //used to deposit amount to the account
@@ -587,7 +616,7 @@ void deposit()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    deposit();
                    break;
                 case 0:
@@ -670,7 +699,7 @@ void transferFund()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    transferFund();
                    break;
                 case 0:
@@ -781,7 +810,7 @@ void changePIN()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    changePIN();
                    break;
                 case 0:
@@ -826,7 +855,7 @@ int search(int accNo)
 //sandwiches the accNo with folder directory and file extension
 void getFileName(char* fileName,int accNo)
 {
-    //author: Rik Biswas
+    //author: Omra Akhtar
 
     //create expty string accstr
     char accstr[10]="";
@@ -868,7 +897,7 @@ int digitCount(int n)//12345
 //generates spaces according to the number of digits
 void spaceGen(char* st,int x)//x=0
 {
-    //author: Rik Biswas
+    //author: Omra Akhtar
     int k;
     for(k=0;k<9-digitCount(x);k++)
     {
