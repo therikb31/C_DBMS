@@ -3,6 +3,7 @@
 #include<stdlib.h>
 
 //Declaring the functions used in this program
+
 void importDetails();
 void importTrans();
 void writer();
@@ -21,6 +22,7 @@ void intToStr(char*,int);
 int  strToInt(char*);
 int  digitCount(int);
 void spaceGen(char*,int);
+
 //Creating a structure of datatype 'transaction'
 struct transaction
 {
@@ -158,8 +160,8 @@ void loginPage()
     //import details from accDet.txt to structure acc
     importDetails();
 
-    //clear the previous terminal commands 
-    system("clear");
+    //cls the previous terminal commands 
+    system("cls");
 
     int ch,ch1,ch2;
     printf("+------------------------------------------+\n");
@@ -167,9 +169,9 @@ void loginPage()
     printf("+------------------------------------------+\n\n");
 
     //Prompts the user to enter a choice
-    printf("1.Login\n2.Create Account\nEnter your Choice:");
+    printf("1.Login\n2.Create Account\n0.Exit\nEnter your Choice:");
     scanf("%d",&ch);
-    system("clear");
+    system("cls");
     switch(ch)
     {
         case 1:
@@ -178,7 +180,7 @@ void loginPage()
             if(login()==1)
             {
                 //If login is successfull, the user is redirected to the Menu
-                system("clear");
+                system("cls");
                 menu();
             }
             else
@@ -223,6 +225,10 @@ void loginPage()
                 break;
             }
             break;
+        case 0:
+  
+                printf("Thank you for Banking with us!\n");
+                break;
 
         default:
             printf("Wrong Choice!");
@@ -377,7 +383,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("clear");
+                    system("cls");
                     createAccount();
                     break;
                 case 0:
@@ -399,7 +405,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 createAccount();
                 break;
             case 0:
@@ -432,32 +438,36 @@ void menu()
     printf("+------------------------------------------+\n\n");
 
     printf("Welcome %s %s,\n\n",acc[userIndex].firstName,acc[userIndex].lastName);
-    printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\nEnter your choice:");
+    printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\n0.Exit\nEnter your choice:");
     scanf("%d",&ch1);
     switch (ch1)
     {
         case 1:
-            system("clear");
+            system("cls");
             withdrawl();
             break;
         case 2:
-            system("clear");
+            system("cls");
             deposit();
             break;
         case 3:
-            system("clear");
+            system("cls");
             transferFund();
             break;
         case 4:
-            system("clear");
+            system("cls");
             transHistory();
             break;
         case 5:
-            system("clear");
+            system("cls");
             changePIN();
             break;
+        case 0:
+            system("cls");
+            printf("Thank you for banking with us!!\n");
+            break;
         default:
-            system("clear");
+            system("cls");
             printf("Wrong Choice!\n");
             break;
     }
@@ -471,7 +481,7 @@ void menu()
     switch(ch)
     {
         case 1:
-            system("clear");
+            system("cls");
             menu();
             break;
         case 0:
@@ -577,7 +587,7 @@ void deposit()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    deposit();
                    break;
                 case 0:
@@ -660,7 +670,7 @@ void transferFund()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    transferFund();
                    break;
                 case 0:
@@ -771,7 +781,7 @@ void changePIN()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    changePIN();
                    break;
                 case 0:
