@@ -11,7 +11,7 @@ void loginPage();
 int  login();
 void createAccount();
 void menu();
-void withdrawl();
+void withdrawal();
 void deposit();
 void transferFund();
 void transHistory();
@@ -58,9 +58,10 @@ int transCount=0;
 int userIndex;
 
 
-void main()
+int main()
 {
     loginPage();
+    return 0;
 }
 
 //reads the data stored in accDet.txt and stores it in structure variable acc
@@ -95,14 +96,15 @@ void importTrans()
 
     FILE* fp;
     int accNo,i=0;
-    char fileName[30]="";
+    char *fileName;
+    fileName = (char *)malloc(30*(sizeof(char)));
 
     //fetches the account number of the user currently logged in
     accNo = acc[userIndex].accountNumber;
 
 
     //gives us the required filename to access the transactions of a given account number
-    getFileName(&fileName[0],accNo);
+    getFileName(fileName,accNo);
 
 
     //opens the requires file that contains the transaction details of the user
@@ -230,7 +232,21 @@ void loginPage()
                 break;
 
         default:
-            printf("Wrong Choice!");
+            printf("Wrong Choice!\n");
+            printf("\n\n1.Return to Login Page\n0.Exit\nEnter your choice:");
+            scanf("%d",&ch1);
+            switch (ch1)
+            {
+            case 1:
+                loginPage();
+                break;
+            case 0:
+                printf("Thank you for Banking with us!\n");
+                break;
+            default:
+                printf("Wrong Choice!");
+                break;
+            }
             break;
     }
 }
@@ -358,7 +374,7 @@ void createAccount()
             // a file of filename <accno>.txt has to be created in the folder 'transaction'
             // to store the transactions made by the user. This function is used to generate
             // the appropriate filename with respect to the account number
-            getFileName(&fileName[0],accno);// ./Transaction/100006.txt
+            getFileName(&fileName[0],accno);// ./Transaction/<accno>.txt
 
 
             //required file is opened in write mode
@@ -437,13 +453,13 @@ void menu()
     printf("+------------------------------------------+\n\n");
 
     printf("Welcome %s %s,\n\n",acc[userIndex].firstName,acc[userIndex].lastName);
-    printf("1.Withdrawl\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\n0.Exit\nEnter your choice:");
+    printf("1.withdrawal\n2.Deposit\n3.Transfer Fund\n4.Transaction History\n5.Change PIN\n0.Exit\nEnter your choice:");
     scanf("%d",&ch1);
     switch (ch1)
     {
         case 1:
             system("clear");
-            withdrawl();
+            withdrawal();
             break;
         case 2:
             system("clear");
@@ -498,8 +514,8 @@ void menu()
 }
 
 
-//used to perform amount withdrawl from account
-void withdrawl()
+//used to perform amount withdrawal from account
+void withdrawal()
 {
     //author: Rik Biswas
 
@@ -527,7 +543,7 @@ void withdrawl()
             //reduces the balance of user
             acc[userIndex].balance -= amt;
 
-            //displays current balance after withdrawl
+            //displays current balance after withdrawal
             printf("Transaction Successful!!\nYour Account balance is %d\n",acc[userIndex].balance);
 
             //fetches the filename for the current account number
@@ -558,8 +574,8 @@ void withdrawl()
         {
             case 1:
                 system("clear");
-                withdrawl();
-                break;
+                withdrawal();
+                break; 
             case 0:
                 printf("Thank you for Banking with Us!!"); 
                 break;
@@ -864,7 +880,7 @@ void getFileName(char* fileName,int accNo)
     strcpy(fileName,"./Transaction/");
 
     //convert integer accNo to string and store in accstr
-    intToStr(&accstr[0],accNo);
+    intToStr(&accstr[0],accNo); 
 
     //copy accstr to the string fileName
     strcat(fileName,accstr);
