@@ -6,9 +6,11 @@
 
 void importDetails();
 void importTrans();
+void importAdmin();
 void writer();
 void loginPage();
 int  login();
+int adminLogin();
 void createAccount();
 void menu();
 void withdrawal();
@@ -17,6 +19,7 @@ void transferFund();
 void transHistory();
 void changePIN();
 int  search(int);
+int searchAdmin(char*);
 void getFileName(char*,int);
 void intToStr(char*,int);
 int  strToInt(char*);
@@ -42,6 +45,15 @@ struct data
     int balance;
 };
 
+struct adminData
+{
+    char employeeId[5];
+    char firstName[20];
+    char lastName[20];
+    char designation[30];
+    char password[15];
+};
+
 //Initialising a global data variable to store all the accounts available
 struct data acc[100];
 
@@ -56,6 +68,10 @@ int transCount=0;
 
 //Initialsing a global Integer variable to store the index of given record in accDet.txt file
 int userIndex;
+
+struct adminData admin[100];
+int adminCount=0;
+int adminIndex;
 
 
 int main()
@@ -126,6 +142,20 @@ void importTrans()
     fclose(fp);
 }
 
+void importAdmin()
+{
+    int i=0;
+    FILE *fp;
+    fp=fopen("admin.txt","r");
+    while(!feof(fp))
+    {
+        fscanf(fp,"%s %s %s %s %s",admin[i].employeeId,admin[i].firstName,admin[i].lastName,admin[i].designation,admin[i].password);
+        i++;
+    }
+    adminCount=i;
+    fclose(fp);
+}
+
 //Writes all the changes made to structure acc into the file accDet.txt
 void writer()
 {
@@ -162,8 +192,8 @@ void loginPage()
     //import details from accDet.txt to structure acc
     importDetails();
 
-    //clear the previous terminal commands 
-    system("clear");
+    //cls the previous terminal commands 
+    system("cls");
 
     int ch,ch1,ch2;
     printf("+------------------------------------------+\n");
@@ -171,18 +201,26 @@ void loginPage()
     printf("+------------------------------------------+\n\n");
 
     //Prompts the user to enter a choice
-    printf("1.Login\n2.Create Account\n0.Exit\nEnter your Choice:");
+    printf("1.Login as admin\n2.Login as user\n3.Create Account\n0.Exit\nEnter your Choice:");
     scanf("%d",&ch);
-    system("clear");
+    system("cls");
     switch(ch)
     {
         case 1:
+            importAdmin();
+            adminLogin();
+            break;
+            
+            
+
+        
+        case 2:
 
             //Prompts the user for login details
             if(login()==1)
             {
                 //If login is successfull, the user is redirected to the Menu
-                system("clear");
+                system("cls");
                 menu();
             }
             else
@@ -205,7 +243,7 @@ void loginPage()
                 }
             }
             break;
-        case 2:
+        case 3:
 
             //User is redirected to the create account section
             createAccount();
@@ -319,6 +357,38 @@ int login()
         printf("Enter Valid Account Number\n");
     }
 }
+int adminLogin()
+{
+    //author:Ananya Verma
+    int i;
+    
+    char employeeId[5];
+    char password[20];
+    printf("Employee ID: ");
+    scanf("%s",employeeId);
+    i=searchAdmin(&employeeId[0]);
+    if(i>=0)
+    {
+        adminIndex=i;
+        printf("Password: ");
+        scanf("%s",password);
+        if(strcmp(admin[adminIndex].password,password)==0)
+        {
+            printf("Login Successful\n");
+            return (1);
+        }
+        else
+        {
+            printf("Incorrect password\n");
+            return(0);
+        }
+    }
+    else
+    {
+        printf("Admin does not exist\n");
+        return(0);
+    }
+}
 
 //adds user entered details to the structure acc
 void createAccount()
@@ -398,7 +468,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("clear");
+                    system("cls");
                     createAccount();
                     break;
                 case 0:
@@ -420,7 +490,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 createAccount();
                 break;
             case 0:
@@ -458,32 +528,32 @@ void menu()
     switch (ch1)
     {
         case 1:
-            system("clear");
+            system("cls");
             withdrawal();
             break;
         case 2:
-            system("clear");
+            system("cls");
             deposit();
             break;
         case 3:
-            system("clear");
+            system("cls");
             transferFund();
             break;
         case 4:
-            system("clear");
+            system("cls");
             transHistory();
             break;
         case 5:
-            system("clear");
+            system("cls");
             changePIN();
             break;
         case 0:
             f=1;
-            system("clear");
+            system("cls");
             printf("Thank you for banking with us!!\n");
             break;
         default:
-            system("clear");
+            system("cls");
             printf("Wrong Choice!\n");
             break;
     }
@@ -499,7 +569,7 @@ void menu()
         switch(ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 menu();
                 break;
             case 0:
@@ -573,7 +643,7 @@ void withdrawal()
         switch(ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 withdrawal();
                 break; 
             case 0:
@@ -632,7 +702,7 @@ void deposit()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    deposit();
                    break;
                 case 0:
@@ -715,7 +785,7 @@ void transferFund()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    transferFund();
                    break;
                 case 0:
@@ -826,7 +896,7 @@ void changePIN()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    changePIN();
                    break;
                 case 0:
@@ -867,6 +937,20 @@ int search(int accNo)
     //the flag value is returned. negative return value indicates missing account 
     return(x);
 }
+int searchAdmin(char* EID)
+{
+    int i,f=-1;
+    for(i=0;i<adminCount;i++)
+    {
+        if(strcmp(admin[i].employeeId,EID)==0)
+        {
+            f=i;
+            break;
+        }
+    }
+    return(f);
+}
+
 
 //sandwiches the accNo with folder directory and file extension
 void getFileName(char* fileName,int accNo)
