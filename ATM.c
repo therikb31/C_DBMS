@@ -13,11 +13,14 @@ int  login();
 int adminLogin();
 void createAccount();
 void menu();
+void adminMenu();
 void withdrawal();
 void deposit();
 void transferFund();
 void transHistory();
 void changePIN();
+void approveAccount();
+int disapproveCount();
 int  search(int);
 int searchAdmin(char*);
 void getFileName(char*,int);
@@ -43,6 +46,7 @@ struct data
     char lastName[20];
     int pin;
     int balance;
+    int approved;
 };
 
 struct adminData
@@ -95,7 +99,7 @@ void importDetails()
     while(!feof(fp))
     {
         //reads the data recordwise and stores it in 'i'th index of acc
-        fscanf(fp,"%d %s %s %d %d",&acc[i].accountNumber,acc[i].firstName,acc[i].lastName,&acc[i].pin,&acc[i].balance);
+        fscanf(fp,"%d %s %s %d %d %d",&acc[i].accountNumber,acc[i].firstName,acc[i].lastName,&acc[i].pin,&acc[i].balance,&acc[i].approved);
         i++;
     }
     //the final value of i gives us the number of records in accDet.txt
@@ -172,7 +176,7 @@ void writer()
     for (i=0 ; i <dataCount ; i++)
     {
         //the data in structures is written into the file recordwise
-        fprintf(fp,"%d\t%s\t%s\t%d\t%d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance);
+        fprintf(fp,"%d\t%s\t%s\t%d\t%d\t%d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved);
 
         //we avoid printing a blank line after the last record
         if(i < dataCount-1 )
@@ -208,20 +212,31 @@ void loginPage()
     {
         case 1:
             importAdmin();
-            adminLogin();
+            
+            if(adminLogin()==1)
+            {
+                system("cls");
+                adminMenu();   
+            }
             break;
             
-            
-
-        
         case 2:
 
             //Prompts the user for login details
             if(login()==1)
             {
+                if(acc[userIndex].approved==1)
+                {
+                    system("cls");
+
+                    menu();
+                }
+                else
+                {
+                    printf("Your account has not been approved yet\nThank you for visiting us\n");
+                }
                 //If login is successfull, the user is redirected to the Menu
-                system("cls");
-                menu();
+                
             }
             else
             {
@@ -437,7 +452,8 @@ void createAccount()
         if(rbal>=0)
         {
             acc[dataCount].balance = rbal;
-            printf("Your account has been successfully created!!\n");
+            acc[dataCount].approved = -1;
+            printf("Your account has been successfully sent for verification!!\n");
             printf("Your account number is %d\n",accno);
 
 
@@ -581,6 +597,28 @@ void menu()
         }
     }
     
+}
+void adminMenu()
+{
+    int ch;
+    printf("+------------------------------------------+\n");
+    printf("|\t\t    HOME                   |\n");
+    printf("+------------------------------------------+\n\n");
+    printf("Welcome %s %s,\n\n",admin[adminIndex].firstName,admin[adminIndex].lastName);
+    printf("1.Approve new accounts\n2.Approve transaction\n3.View accounts\n4.Delete account\nEnter your choice: ");
+    scanf("%d",&ch);
+    switch(ch)
+    {
+        case 1:
+            system("cls");
+            approveAccount();
+
+            break;
+        default:
+            break;
+    }
+    
+
 }
 
 
@@ -915,6 +953,42 @@ void changePIN()
         printf("Incorrect PIN!\n");
     }
 }
+void approveAccount()
+{
+    importDetails();
+    int i,ch,localUserIndex,accNo,c=disapproveCount();
+    while (c!=0)
+    {
+        for(i=0;i<dataCount;i++)
+        {
+            if(acc[i].approved==-1)
+            {
+                system("cls");
+                printf("%d\t%s\t%s\t%d\t%d\t%d\n",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved);
+            }
+        }
+        printf("Account number: ");
+        scanf("%d",&accNo);
+        printf("Approve(1/0): ");
+        scanf("%d",&ch);
+        localUserIndex=search(accNo);
+        acc[localUserIndex].approved=ch;
+        c--;
+    }
+    writer();    
+}
+int disapproveCount()
+{
+    int i,c=0;
+    for(i=0;i<dataCount;i++)
+    {
+        if(acc[i].approved==-1)
+        {
+            c++;
+        }
+    }
+    return(c);
+}
 
 //checks whether given account number exists in structure acc
 int search(int accNo)
@@ -939,6 +1013,7 @@ int search(int accNo)
 }
 int searchAdmin(char* EID)
 {
+    //author: Ananya Verma
     int i,f=-1;
     for(i=0;i<adminCount;i++)
     {
