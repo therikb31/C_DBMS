@@ -28,6 +28,7 @@ void intToStr(char*,int);
 int  strToInt(char*);
 int  digitCount(int);
 void spaceGen(char*,int);
+void deleteAccount();
 
 //Creating a structure of datatype 'transaction'
 struct transaction
@@ -197,10 +198,10 @@ void loginPage()
     //import details from accDet.txt to structure acc
     importDetails();
 
-    //clear the previous terminal commands 
-    system("clear");
+    //cls the previous terminal commands 
+    system("cls");
 
-    int ch,ch1,ch2;
+    int ch,ch1,ch2,ex;
     printf("+------------------------------------------+\n");
     printf("|\tWelcome to the Bank Of TINT        |\n");
     printf("+------------------------------------------+\n\n");
@@ -208,28 +209,27 @@ void loginPage()
     //Prompts the user to enter a choice
     printf("1.Login as admin\n2.Login as user\n3.Create Account\n0.Exit\nEnter your Choice:");
     scanf("%d",&ch);
-    system("clear");
+    system("cls");
     switch(ch)
     {
         case 1:
             importAdmin();
-            
             if(adminLogin()==1)
             {
-                system("clear");
+                system("cls");
                 adminMenu();   
             }
 
             break;
             
         case 2:
-
+              ex=login();
             //Prompts the user for login details
-            if(login()==1)
+            if(ex==1)
             {
                 if(acc[userIndex].approved==1)
-                {
-                    system("clear");
+                { 
+                    system("cls");
 
                     menu();
                 }
@@ -239,6 +239,11 @@ void loginPage()
                 }
                 //If login is successfull, the user is redirected to the Menu
                 
+            }
+            else if(ex==-1)
+            {
+                printf("Your Account is no longer Active\nContact the Bank Authorities\n");
+                printf("Thank You For Visiting Us!");
             }
             else
             {
@@ -331,37 +336,42 @@ int login()
         //if account is found in database, we proceed with login
         if(i>=0)
         {
-            //ask the user for pin
-            printf("PIN:");
-            scanf("%s",pinStr);
-            pin=strToInt(&pinStr[0]);
-
-            if (pin >= 0)
+            if(acc[i].active==1)
             {
-                //check whether the user entered pin matches the pin in structure acc
-                if(pin==acc[i].pin)
-                {   
-                    //if true, the index of account in structure acc is stored in userIndex
-                    userIndex=i;
+                //ask the user for pin
+                    printf("PIN:");
+                    scanf("%s",pinStr);
+                    pin=strToInt(&pinStr[0]);
+                    if (pin >= 0)
+                    {
+                        //check whether the user entered pin matches the pin in structure acc
+                        if(pin==acc[i].pin)
+                        {   
+                            //if true, the index of account in structure acc is stored in userIndex
+                            userIndex=i;
 
-                    //the function returns 1 which indicates authentication successful
-                    return (1);
-                }
-                else
-                {
-                    printf("Incorrect PIN!\n");
+                            //the function returns 1 which indicates authentication successful
+                            return (1);
+                        }
+                        else
+                        {
+                            printf("Incorrect PIN!\n");
 
-                    //as the user entered pin doesnot match the actual pin,
-                    //the function returns 0 which indicate authentication failed
-                    return (0);
-                }
+                            //as the user entered pin doesnot match the actual pin,
+                            //the function returns 0 which indicate authentication failed
+                            return (0);
+                        }
+                    }
+                    else
+                    {
+                        printf("Enter Valid PIN\n");
+                    }      
             }
-            else
-            {
-                printf("Enter Valid PIN\n");
+            else{
+                
+                return (-1);
             }
         }
-
         //if the account is not found in the structure, error message is displayed
         else
         {
@@ -487,7 +497,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("clear");
+                    system("cls");
                     createAccount();
                     break;
                 case 0:
@@ -509,7 +519,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 createAccount();
                 break;
             case 0:
@@ -547,32 +557,32 @@ void menu()
     switch (ch1)
     {
         case 1:
-            system("clear");
+            system("cls");
             withdrawal();
             break;
         case 2:
-            system("clear");
+            system("cls");
             deposit();
             break;
         case 3:
-            system("clear");
+            system("cls");
             transferFund();
             break;
         case 4:
-            system("clear");
+            system("cls");
             transHistory();
             break;
         case 5:
-            system("clear");
+            system("cls");
             changePIN();
             break;
         case 0:
             f=1;
-            system("clear");
+            system("cls");
             printf("Thank you for banking with us!!\n");
             break;
         default:
-            system("clear");
+            system("cls");
             printf("Wrong Choice!\n");
             break;
     }
@@ -588,7 +598,7 @@ void menu()
         switch(ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 menu();
                 break;
             case 0:
@@ -613,16 +623,17 @@ void adminMenu()
     switch(ch)
     {
         case 1:
-            system("clear");
+            system("cls");
             approveAccount();
             break;
+        case 4:
+             system("cls");
+             deleteAccount();
+             break;
         default:
             break;
-    }
-    
-
+    }  
 }
-
 
 //used to perform amount withdrawal from account
 void withdrawal()
@@ -683,7 +694,7 @@ void withdrawal()
         switch(ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 withdrawal();
                 break; 
             case 0:
@@ -742,7 +753,7 @@ void deposit()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    deposit();
                    break;
                 case 0:
@@ -825,7 +836,7 @@ void transferFund()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    transferFund();
                    break;
                 case 0:
@@ -936,7 +947,7 @@ void changePIN()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system("cls");
                    changePIN();
                    break;
                 case 0:
@@ -967,7 +978,7 @@ void approveAccount()
             {
                 if(acc[i].approved==-1)
                 {
-                    system("clear");
+                    system("cls");
                     printf("%d\t%s\t%s\t%d\t%d\t%d\n",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved);
                 }
             }
@@ -989,7 +1000,7 @@ void approveAccount()
         switch (ch)
         {
             case 1:
-                system("clear");
+                system("cls");
                 adminMenu();
                 break;
             case 0:
@@ -1153,5 +1164,44 @@ void intToStr(char* st,int n)
     {
         st[d]=(char)arr[i]+48;
         d++;
+    }
+}
+void deleteAccount()
+{
+    char Accdel[10];
+    int f,sToi,c;
+    printf("Enter the Account that need to be deleted:\n");
+    scanf("%s",Accdel);
+    sToi=strToInt(&Accdel[0]);
+    if(sToi>=0)
+    {
+       f=search(sToi);
+           if(f>=0)
+            {
+                acc[f].active=0;
+                printf("Account Deleted");
+                writer();
+            }
+            else{
+                printf("Account NOT FOUND!");
+            }
+    }
+    else{
+        printf("Invalid Account Number");
+        printf("\n\n1.Return to Menu\n0.Exit\nEnter Your Choice:");
+        scanf("%d",&c);
+        switch (c)
+        {
+            case 1:
+                system("cls");
+                adminMenu();
+                break;
+            case 0:
+                printf("Thank you for Visiting Us!\n");
+                break;
+            default:
+                printf("Wrong Choice!\n");
+                break;
+        }
     }
 }
