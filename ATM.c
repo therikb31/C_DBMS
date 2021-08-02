@@ -47,6 +47,7 @@ struct data
     int pin;
     int balance;
     int approved;
+    int active;
 };
 
 struct adminData
@@ -99,7 +100,7 @@ void importDetails()
     while(!feof(fp))
     {
         //reads the data recordwise and stores it in 'i'th index of acc
-        fscanf(fp,"%d %s %s %d %d %d",&acc[i].accountNumber,acc[i].firstName,acc[i].lastName,&acc[i].pin,&acc[i].balance,&acc[i].approved);
+        fscanf(fp,"%d %s %s %d %d %d %d",&acc[i].accountNumber,acc[i].firstName,acc[i].lastName,&acc[i].pin,&acc[i].balance,&acc[i].approved,&acc[i].active);
         i++;
     }
     //the final value of i gives us the number of records in accDet.txt
@@ -176,7 +177,7 @@ void writer()
     for (i=0 ; i <dataCount ; i++)
     {
         //the data in structures is written into the file recordwise
-        fprintf(fp,"%d\t%s\t%s\t%d\t%d\t%d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved);
+        fprintf(fp,"%d\t%s\t%s\t%d\t%d\t%d\t%d",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved,acc[i].active);
 
         //we avoid printing a blank line after the last record
         if(i < dataCount-1 )
@@ -196,8 +197,8 @@ void loginPage()
     //import details from accDet.txt to structure acc
     importDetails();
 
-    //cls the previous terminal commands 
-    system("cls");
+    //clear the previous terminal commands 
+    system("clear");
 
     int ch,ch1,ch2;
     printf("+------------------------------------------+\n");
@@ -207,7 +208,7 @@ void loginPage()
     //Prompts the user to enter a choice
     printf("1.Login as admin\n2.Login as user\n3.Create Account\n0.Exit\nEnter your Choice:");
     scanf("%d",&ch);
-    system("cls");
+    system("clear");
     switch(ch)
     {
         case 1:
@@ -215,9 +216,10 @@ void loginPage()
             
             if(adminLogin()==1)
             {
-                system("cls");
+                system("clear");
                 adminMenu();   
             }
+
             break;
             
         case 2:
@@ -227,7 +229,7 @@ void loginPage()
             {
                 if(acc[userIndex].approved==1)
                 {
-                    system("cls");
+                    system("clear");
 
                     menu();
                 }
@@ -453,6 +455,7 @@ void createAccount()
         {
             acc[dataCount].balance = rbal;
             acc[dataCount].approved = -1;
+            acc[dataCount].active = 1;
             printf("Your account has been successfully sent for verification!!\n");
             printf("Your account number is %d\n",accno);
 
@@ -484,7 +487,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("cls");
+                    system("clear");
                     createAccount();
                     break;
                 case 0:
@@ -506,7 +509,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 createAccount();
                 break;
             case 0:
@@ -544,32 +547,32 @@ void menu()
     switch (ch1)
     {
         case 1:
-            system("cls");
+            system("clear");
             withdrawal();
             break;
         case 2:
-            system("cls");
+            system("clear");
             deposit();
             break;
         case 3:
-            system("cls");
+            system("clear");
             transferFund();
             break;
         case 4:
-            system("cls");
+            system("clear");
             transHistory();
             break;
         case 5:
-            system("cls");
+            system("clear");
             changePIN();
             break;
         case 0:
             f=1;
-            system("cls");
+            system("clear");
             printf("Thank you for banking with us!!\n");
             break;
         default:
-            system("cls");
+            system("clear");
             printf("Wrong Choice!\n");
             break;
     }
@@ -585,7 +588,7 @@ void menu()
         switch(ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 menu();
                 break;
             case 0:
@@ -610,9 +613,8 @@ void adminMenu()
     switch(ch)
     {
         case 1:
-            system("cls");
+            system("clear");
             approveAccount();
-
             break;
         default:
             break;
@@ -681,7 +683,7 @@ void withdrawal()
         switch(ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 withdrawal();
                 break; 
             case 0:
@@ -740,7 +742,7 @@ void deposit()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    deposit();
                    break;
                 case 0:
@@ -823,7 +825,7 @@ void transferFund()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    transferFund();
                    break;
                 case 0:
@@ -934,7 +936,7 @@ void changePIN()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    changePIN();
                    break;
                 case 0:
@@ -957,25 +959,48 @@ void approveAccount()
 {
     importDetails();
     int i,ch,localUserIndex,accNo,c=disapproveCount();
-    while (c!=0)
+    if (c>0)
     {
-        for(i=0;i<dataCount;i++)
+        while (c!=0)
         {
-            if(acc[i].approved==-1)
+            for(i=0;i<dataCount;i++)
             {
-                system("cls");
-                printf("%d\t%s\t%s\t%d\t%d\t%d\n",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved);
+                if(acc[i].approved==-1)
+                {
+                    system("clear");
+                    printf("%d\t%s\t%s\t%d\t%d\t%d\n",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved);
+                }
             }
+            printf("Account number: ");
+            scanf("%d",&accNo);
+            printf("Approve(1/0): ");
+            scanf("%d",&ch);
+            localUserIndex=search(accNo);
+            acc[localUserIndex].approved=ch;
+            c--;
         }
-        printf("Account number: ");
-        scanf("%d",&accNo);
-        printf("Approve(1/0): ");
-        scanf("%d",&ch);
-        localUserIndex=search(accNo);
-        acc[localUserIndex].approved=ch;
-        c--;
+        writer();    
     }
-    writer();    
+    else
+    {
+        printf("No approvals pending!\n");
+        printf("\n\n1.Return to Menu\n0.Exit\nEnter Your Choice:");
+        scanf("%d",&ch);
+        switch (ch)
+        {
+            case 1:
+                system("clear");
+                adminMenu();
+                break;
+            case 0:
+                printf("Thank you for Visiting Us!\n");
+                break;
+            default:
+                printf("Wrong Choice!\n");
+                break;
+        }
+    }
+    
 }
 int disapproveCount()
 {
