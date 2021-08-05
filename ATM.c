@@ -204,7 +204,7 @@ void loginPage()
     importDetails();
 
     //clear the previous terminal commands 
-    system("clear");
+    system(cl);
 
     int ch,ch1,ch2,ex;
     printf("+------------------------------------------+\n");
@@ -214,14 +214,14 @@ void loginPage()
     //Prompts the user to enter a choice
     printf("1.Login as admin\n2.Login as user\n3.Create Account\n0.Exit\nEnter your Choice:");
     scanf("%d",&ch);
-    system("clear");
+    system(cl);
     switch(ch)
     {
         case 1:
             importAdmin();
             if(adminLogin()==1)
             {
-                system("clear");
+                system(cl);
                 adminMenu();   
             }
 
@@ -234,7 +234,7 @@ void loginPage()
             {
                 if(acc[userIndex].approved==1)
                 { 
-                    system("clear");
+                    system(cl);
 
                     menu();
                 }
@@ -506,7 +506,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("clear");
+                    system(cl);
                     createAccount();
                     break;
                 case 0:
@@ -528,7 +528,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("clear");
+                system(cl);
                 createAccount();
                 break;
             case 0:
@@ -566,32 +566,32 @@ void menu()
     switch (ch1)
     {
         case 1:
-            system("clear");
+            system(cl);
             withdrawal();
             break;
         case 2:
-            system("clear");
+            system(cl);
             deposit();
             break;
         case 3:
-            system("clear");
+            system(cl);
             transferFund();
             break;
         case 4:
-            system("clear");
+            system(cl);
             transHistory();
             break;
         case 5:
-            system("clear");
+            system(cl);
             changePIN();
             break;
         case 0:
             f=1;
-            system("clear");
+            system(cl);
             printf("Thank you for banking with us!!\n");
             break;
         default:
-            system("clear");
+            system(cl);
             printf("Wrong Choice!\n");
             break;
     }
@@ -607,7 +607,7 @@ void menu()
         switch(ch)
         {
             case 1:
-                system("clear");
+                system(cl);
                 menu();
                 break;
             case 0:
@@ -632,11 +632,11 @@ void adminMenu()
     switch(ch)
     {
         case 1:
-            system("clear");
+            system(cl);
             approveAccount();
             break;
         case 4:
-             system("clear");
+             system(cl);
              deleteAccount();
              break;
         default:
@@ -703,7 +703,7 @@ void withdrawal()
         switch(ch)
         {
             case 1:
-                system("clear");
+                system(cl);
                 withdrawal();
                 break; 
             case 0:
@@ -762,7 +762,7 @@ void deposit()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system(cl);
                    deposit();
                    break;
                 case 0:
@@ -845,7 +845,7 @@ void transferFund()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system(cl);
                    transferFund();
                    break;
                 case 0:
@@ -956,7 +956,7 @@ void changePIN()
             switch(ch)
             {
                 case 1:
-                   system("clear");
+                   system(cl);
                    changePIN();
                    break;
                 case 0:
@@ -987,7 +987,7 @@ void approveAccount()
             {
                 if(acc[i].approved==-1)
                 {
-                    system("clear");
+                    system(cl);
                     printf("%d\t%s\t%s\t%d\t%d\t%d\n",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved);
                 }
             }
@@ -1005,7 +1005,7 @@ void approveAccount()
         switch (ch)
         {
             case 1:
-                system("clear");
+                system(cl);
                 adminMenu();
                 break;
             case 0:
@@ -1025,7 +1025,7 @@ void approveAccount()
         switch (ch)
         {
             case 1:
-                system("clear");
+                system(cl);
                 adminMenu();
                 break;
             case 0:
@@ -1218,7 +1218,7 @@ void deleteAccount()
         switch (c)
         {
             case 1:
-                system("clear");
+                system(cl);
                 adminMenu();
                 break;
             case 0:
