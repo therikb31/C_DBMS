@@ -1,7 +1,12 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-
+#ifdef _WIN32
+    char cl[20]="cls";
+#endif
+#ifdef __linux__
+	char cl[20]="clear";
+#endif
 //Declaring the functions used in this program
 
 void importDetails();
@@ -198,8 +203,8 @@ void loginPage()
     //import details from accDet.txt to structure acc
     importDetails();
 
-    //cls the previous terminal commands 
-    system("cls");
+    //clear the previous terminal commands 
+    system("clear");
 
     int ch,ch1,ch2,ex;
     printf("+------------------------------------------+\n");
@@ -209,33 +214,37 @@ void loginPage()
     //Prompts the user to enter a choice
     printf("1.Login as admin\n2.Login as user\n3.Create Account\n0.Exit\nEnter your Choice:");
     scanf("%d",&ch);
-    system("cls");
+    system("clear");
     switch(ch)
     {
         case 1:
             importAdmin();
             if(adminLogin()==1)
             {
-                system("cls");
+                system("clear");
                 adminMenu();   
             }
 
             break;
             
         case 2:
-              ex=login();
+            ex=login();
             //Prompts the user for login details
             if(ex==1)
             {
                 if(acc[userIndex].approved==1)
                 { 
-                    system("cls");
+                    system("clear");
 
                     menu();
                 }
-                else
+                else if(acc[userIndex].approved==-1)
                 {
                     printf("Your account has not been approved yet\nThank you for visiting us\n");
+                }
+                else
+                {
+                    printf("\n\nYour account has been disapproved.\nContact the bank autorities\n");
                 }
                 //If login is successfull, the user is redirected to the Menu
                 
@@ -497,7 +506,7 @@ void createAccount()
             switch (ch1)
             {
                 case 1:
-                    system("cls");
+                    system("clear");
                     createAccount();
                     break;
                 case 0:
@@ -519,7 +528,7 @@ void createAccount()
         switch (ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 createAccount();
                 break;
             case 0:
@@ -557,32 +566,32 @@ void menu()
     switch (ch1)
     {
         case 1:
-            system("cls");
+            system("clear");
             withdrawal();
             break;
         case 2:
-            system("cls");
+            system("clear");
             deposit();
             break;
         case 3:
-            system("cls");
+            system("clear");
             transferFund();
             break;
         case 4:
-            system("cls");
+            system("clear");
             transHistory();
             break;
         case 5:
-            system("cls");
+            system("clear");
             changePIN();
             break;
         case 0:
             f=1;
-            system("cls");
+            system("clear");
             printf("Thank you for banking with us!!\n");
             break;
         default:
-            system("cls");
+            system("clear");
             printf("Wrong Choice!\n");
             break;
     }
@@ -598,7 +607,7 @@ void menu()
         switch(ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 menu();
                 break;
             case 0:
@@ -618,16 +627,16 @@ void adminMenu()
     printf("|\t\t    HOME                   |\n");
     printf("+------------------------------------------+\n\n");
     printf("Welcome %s %s,\n\n",admin[adminIndex].firstName,admin[adminIndex].lastName);
-    printf("1.Approve new accounts\n2.Approve transaction\n3.View accounts\n4.Delete account\nEnter your choice: ");
+    printf("1.Approve new accounts\n2k .Delete account\nEnter your choice: ");
     scanf("%d",&ch);
     switch(ch)
     {
         case 1:
-            system("cls");
+            system("clear");
             approveAccount();
             break;
         case 4:
-             system("cls");
+             system("clear");
              deleteAccount();
              break;
         default:
@@ -694,7 +703,7 @@ void withdrawal()
         switch(ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 withdrawal();
                 break; 
             case 0:
@@ -753,7 +762,7 @@ void deposit()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    deposit();
                    break;
                 case 0:
@@ -836,7 +845,7 @@ void transferFund()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    transferFund();
                    break;
                 case 0:
@@ -947,7 +956,7 @@ void changePIN()
             switch(ch)
             {
                 case 1:
-                   system("cls");
+                   system("clear");
                    changePIN();
                    break;
                 case 0:
@@ -978,7 +987,7 @@ void approveAccount()
             {
                 if(acc[i].approved==-1)
                 {
-                    system("cls");
+                    system("clear");
                     printf("%d\t%s\t%s\t%d\t%d\t%d\n",acc[i].accountNumber,acc[i].firstName,acc[i].lastName,acc[i].pin,acc[i].balance,acc[i].approved);
                 }
             }
@@ -990,6 +999,22 @@ void approveAccount()
             acc[localUserIndex].approved=ch;
             c--;
         }
+        printf("No approvals pending!\n");
+        printf("\n\n1.Return to Menu\n0.Exit\nEnter Your Choice:");
+        scanf("%d",&ch);
+        switch (ch)
+        {
+            case 1:
+                system("clear");
+                adminMenu();
+                break;
+            case 0:
+                printf("Thank you for Visiting Us!\n");
+                break;
+            default:
+                printf("Wrong Choice!\n");
+                break;
+        }
         writer();    
     }
     else
@@ -1000,7 +1025,7 @@ void approveAccount()
         switch (ch)
         {
             case 1:
-                system("cls");
+                system("clear");
                 adminMenu();
                 break;
             case 0:
@@ -1193,7 +1218,7 @@ void deleteAccount()
         switch (c)
         {
             case 1:
-                system("cls");
+                system("clear");
                 adminMenu();
                 break;
             case 0:
